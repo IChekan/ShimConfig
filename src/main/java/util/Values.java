@@ -11,6 +11,10 @@ public final class Values {
     private static String pathToShim;
     private static String pathToTestProperties; //optional
 
+    //This is gained by parsing the response of the "hadoop version" command
+    private static String hadoopVendor;
+    private static String hadoopVendorVersion;
+
     // Values, that is determined from xml files
     private static boolean secured;
 
@@ -38,11 +42,12 @@ public final class Values {
     }
 
     public static void populateValuesAfterDownloading(){
-        secured = isSecured();
+        isSecured();
+        readHadoopVendorAndVersion();
     }
 
-    //determine if shim secured
-    private static boolean isSecured() {
+    //determine if shim secured and set appropriate value
+    private static void isSecured() {
         XmlPropertyHandler xmlPropertyHandler = new XmlPropertyHandler();
         String secured = xmlPropertyHandler.readXmlPropertyValue(pathToShim + "core-site.xml",
             "hadoop.security.authorization" );
@@ -50,9 +55,15 @@ public final class Values {
         System.out.println("Unable to read 'hadoop.security.authorization' property!!!");
         }
         else if (secured.equalsIgnoreCase("true")) {
-            return true;
+            Values.secured = true;
         }
-        return false;
+        else { Values.secured = false; }
+    }
+
+    //determine hadoop vendor and it`s version
+    private static void readHadoopVendorAndVersion() {
+        hadoopVendor = HadoopVendorAndVersionParser.hadoopVendorParser(user,host,password);
+        hadoopVendorVersion = HadoopVendorAndVersionParser.hadoopVendorVersionParser(user,host,password);
     }
 
     public static String getUser() {
@@ -81,6 +92,14 @@ public final class Values {
 
     public static boolean getSecured() {
         return secured;
+    }
+
+    public static String getHadoopVendor() {
+        return hadoopVendor;
+    }
+
+    public static String getHadoopVendorVersion() {
+        return hadoopVendorVersion;
     }
 
 }

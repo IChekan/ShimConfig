@@ -1,9 +1,11 @@
 package modifiers;
 
 import util.PropertyHandler;
+import util.SSHUtils;
 import util.Values;
 import util.XmlPropertyHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -24,7 +26,21 @@ public class ModifyTestProperties {
             propertyHandler.setProperty(pathToTestProperties, "secure_cluster", "false" );
         }
 
-        //TODO: determine if it is hdp or cdh shim. With version preferably
+        //TODO: kinit user and password
+        //TODO: make kinit on clusters
+
+
+        //TODO: verify shim_active is for actual shim, not folder...
+
+        //set shim_active
+        propertyHandler.setProperty(pathToTestProperties, "shim_active", Values.getHadoopVendor()
+                + Values.getHadoopVendorVersion() );
+
+        // set sshServer, sshUser, sshPassword
+        propertyHandler.setProperty(pathToTestProperties, "sshServer", Values.getHost() );
+        propertyHandler.setProperty(pathToTestProperties, "sshUser", Values.getUser() );
+        propertyHandler.setProperty(pathToTestProperties, "sshPassword", Values.getPassword() );
+
 
         // set hdfsServer, hdfsProto, hdfsPort, hdfsUrl values
         String defaultFS = xmlPropertyHandler.readXmlPropertyValue(Values.getPathToShim() + "core-site.xml",
@@ -62,24 +78,42 @@ public class ModifyTestProperties {
         }
 
         // determine hive host and set all values for it
-        String hiveUris = xmlPropertyHandler.readXmlPropertyValue(Values.getPathToShim() + "hive-site.xml",
-                "hive.metastore.uris" );
-        String[] hiveHostWithoutThrift = hiveUris.split("://");
-        String[] hiveHostWithoutPort = hiveHostWithoutThrift[1].split(":");
-        propertyHandler.setProperty(pathToTestProperties, "sshServer", hiveHostWithoutPort[0] );
-        propertyHandler.setProperty(pathToTestProperties, "hive2_hostname", hiveHostWithoutPort[0] );
+        String allClusterNodesGrepHostname = SSHUtils.getCommandResponseBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+                "hdfs dfsadmin -report | grep Hostname" );
+        allClusterNodesGrepHostname = allClusterNodesGrepHostname.replaceAll("\\r|\\n", "");
+        String[] allClusterNodes = allClusterNodesGrepHostname.replaceFirst("Hostname: ", "").split("Hostname: ");
+        String hiveServerNode = "";
+        for ( String node : allClusterNodes ) {
+            if (SSHUtils.getCommandResponseBySSH(Values.getUser(), node, Values.getPassword(),
+                    "ps aux | grep HiveServer2" ).contains("org.apache.hive.service.server.HiveServer2")) {
+                hiveServerNode = node;
+            }
+        }
+        if (!hiveServerNode.equals("")) {
+            propertyHandler.setProperty(pathToTestProperties, "hive2_hostname", hiveServerNode);
+            //If vendor is cdh - adding Impala properties, same as for hive
+            if (Values.getHadoopVendor().equalsIgnoreCase("cdh")) {
+                propertyHandler.setProperty(pathToTestProperties, "impala_hostname", hiveServerNode);
+            }
+        }
+        else System.out.println ("Hive node was not determined!!!");
         //if secured - add hive principal
         if (Values.getSecured()) {
             String hivePrincipalTemp1[] = xmlPropertyHandler.readXmlPropertyValue(Values.getPathToShim() + "hive-site.xml",
                     "hive.metastore.kerberos.principal" ).split("/");;
             String hivePrincipalTemp2[] = hivePrincipalTemp1[1].split("@");
-            String hivePrincipal = hivePrincipalTemp1[0] + "/" + hiveHostWithoutPort[0] + "@" + hivePrincipalTemp2[1];
+            String hivePrincipal = hivePrincipalTemp1[0] + "/" + hiveServerNode + "@" + hivePrincipalTemp2[1];
 
             propertyHandler.setProperty(pathToTestProperties, "hive2_option", "principal");
             propertyHandler.setProperty(pathToTestProperties, "hive2_principal", hivePrincipal);
+            //If vendor is cdh - adding Impala secured properties, same as for hive
+            if (Values.getHadoopVendor().equalsIgnoreCase("cdh")) {
+                if (Values.getSecured()) {
+                    propertyHandler.setProperty(pathToTestProperties, "impala_KrbRealm", hivePrincipalTemp2[1]);
+                    propertyHandler.setProperty(pathToTestProperties, "impala_KrbHostFQDN", hiveServerNode);
+                }
+            }
         }
-
-        //TODO: add impala
 
         // add zookeeper host and port
         //for hdp it can be taken from "hadoop.registry.zk.quorum" property
@@ -112,10 +146,51 @@ public class ModifyTestProperties {
         propertyHandler.setProperty(pathToTestProperties, "zookeeper_host", zkQuorumRes);
         propertyHandler.setProperty(pathToTestProperties, "zookeeper_port", zkPort);
 
-        // TODO:Oozie
-        // TODO:sqoop_secure_libjar_path
-        // TODO:spark
+        // Adding Oozie oozie_server
+        for ( String node : allClusterNodes ) {
+            if (SSHUtils.getCommandResponseBySSH(Values.getUser(), node, Values.getPassword(),
+                    "ps aux | grep oozie" ).contains(" -Doozie.http.hostname")) {
+                propertyHandler.setProperty(pathToTestProperties, "oozie_server", node);
+            }
+        }
 
+        //find spark-assembly jar
+        String[] findSparkAssembly = SSHUtils.getCommandResponseBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+                "find / -name 'spark-assembly*'").split("\\r|\\n");
+        String localSparkAssemblyPath = "";
+        loopForSpark:
+        for (String a : findSparkAssembly) {
+            if (a.contains("spark-assembly-")) {
+                localSparkAssemblyPath = a;
+                break loopForSpark;
+            }
+        }
+        // copy spark-assembly jar to hdfs and set spark_yarn_jar property
+        SSHUtils.getCommandResponseBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+                ("hadoop fs -copyFromLocal " + localSparkAssemblyPath + " /opt/pentaho"));
+        File f = new File(localSparkAssemblyPath);
+        String sparkAssemblyName = f.getName();
+        propertyHandler.setProperty(pathToTestProperties, "spark_yarn_jar", "${hdfsUrl}/opt/pentaho/" + sparkAssemblyName);
+        // if it is hdp cluster - 2 more propertyes are needed
+        if (Values.getHadoopVendor().equalsIgnoreCase("hdp")) {
+            String hdpVersion = SSHUtils.getCommandResponseBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+                    "hdp-select versions").replaceAll("\\r|\\n", "");
+            propertyHandler.setProperty(pathToTestProperties, "spark_driver_extraJavaOptions", "-Dhdp.version=" + hdpVersion);
+            propertyHandler.setProperty(pathToTestProperties, "spark_yarn_am_extraJavaOptions", "-Dhdp.version=" + hdpVersion);
+        }
+
+        // TODO: move -Dhdp.version= change in config.properties to another class (ModifyPluginConfigProperties)
+        String configPropertiesFile = Values.getPathToShim() + File.separator + "config.properties";
+        if (Values.getHadoopVendor().equalsIgnoreCase("hdp")) {
+            String hdpVersion = SSHUtils.getCommandResponseBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+                    "hdp-select versions").replaceAll("\\r|\\n", "");
+            propertyHandler.setProperty(configPropertiesFile, "java.system.hdp.version", hdpVersion);
+        }
+
+
+
+
+        // TODO:sqoop_secure_libjar_path
 
 
     }

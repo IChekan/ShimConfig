@@ -1,7 +1,8 @@
 import modifiers.AddCrossPlatform;
 import modifiers.ModifyPluginConfigProperties;
 import modifiers.ModifyTestProperties;
-import util.*;
+import util.SSHUtils;
+import util.Values;
 
 /**
  * Created by Ihar_Chekan on 10/19/2016.
@@ -11,7 +12,7 @@ class ShimConfigRun {
     public void shimConfigRun () {
 
         for (int i = 0; i < Values.getFilesToRetrieve().length; i++) {
-            CopyFileSSH.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+            SSHUtils.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
                     Values.getFilesToRetrieve()[i], Values.getPathToShim());
         }
 
@@ -28,7 +29,7 @@ class ShimConfigRun {
 
         // Optional: Modify test.properties
         try {
-            if (Values.getPathToTestProperties() != null) {
+            if (Values.getPathToTestProperties() != null || !"".equals(Values.getPathToTestProperties()) ) {
                 ModifyTestProperties.modifyTestProperties(Values.getPathToTestProperties());
             }
         } catch ( ArrayIndexOutOfBoundsException e) {

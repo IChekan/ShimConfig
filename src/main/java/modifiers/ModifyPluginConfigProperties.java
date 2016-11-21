@@ -1,10 +1,10 @@
 package modifiers;
 
-import util.CopyFileSSH;
 import util.PropertyHandler;
+import util.SSHUtils;
 import util.Values;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * Created by Ihar_Chekan on 10/14/2016.
@@ -13,7 +13,7 @@ public class ModifyPluginConfigProperties {
 
     public void modifyPluginProperties () {
         if (Values.getSecured()) {
-            CopyFileSSH.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
+            SSHUtils.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
                     "/etc/krb5.conf", Values.getPathToShim() );
             System.out.println("krb5.conf copied from cluster to shim location. Please move it to appropriate place.");
         }
