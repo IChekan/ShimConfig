@@ -2,7 +2,9 @@ import modifiers.AddCrossPlatform;
 import modifiers.ModifyPluginConfigProperties;
 import modifiers.ModifyTestProperties;
 import util.SSHUtils;
-import util.Values;
+import util.ShimValues;
+
+import java.io.IOException;
 
 /**
  * Created by Ihar_Chekan on 10/19/2016.
@@ -11,17 +13,17 @@ class ShimConfigRun {
 
     public void shimConfigRun () {
 
-        for (int i = 0; i < Values.getFilesToRetrieve().length; i++) {
-            SSHUtils.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
-                    Values.getFilesToRetrieve()[i], Values.getPathToShim());
+        for (int i = 0; i < ShimValues.getFilesToRetrieve().length; i++) {
+            SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
+                    ShimValues.getFilesToRetrieve()[i], ShimValues.getPathToShim());
         }
 
         //set Values after copying the *-site.xml files
-        Values.populateValuesAfterDownloading();
+        ShimValues.populateValuesAfterDownloading();
 
         // Adding cross-platform to mapred-site.xml
         AddCrossPlatform addCrossPlatform = new AddCrossPlatform();
-        addCrossPlatform.addCrossPlatform(Values.getPathToShim() + "mapred-site.xml");
+        addCrossPlatform.addCrossPlatform(ShimValues.getPathToShim() + "mapred-site.xml");
 
         // Modify plugin.properties
         ModifyPluginConfigProperties modifyPluginConfigProperties = new ModifyPluginConfigProperties();
@@ -29,11 +31,13 @@ class ShimConfigRun {
 
         // Optional: Modify test.properties
         try {
-            if (Values.getPathToTestProperties() != null || !"".equals(Values.getPathToTestProperties()) ) {
-                ModifyTestProperties.modifyTestProperties(Values.getPathToTestProperties());
+            if (ShimValues.getPathToTestProperties() != null || !"".equals(ShimValues.getPathToTestProperties()) ) {
+                ModifyTestProperties.modifyAllTestProperties(ShimValues.getPathToTestProperties());
             }
         } catch ( ArrayIndexOutOfBoundsException e) {
             // do nothing
+        } catch ( IOException e ) {
+            System.out.println( "I see IOexception..." );
         }
 
     }

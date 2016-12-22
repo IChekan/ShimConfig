@@ -10,20 +10,20 @@ import java.io.*;
  */
 public class PropertyHandler {
 
-    public String getPropertyFromFile (String pathToFile, String property) {
+    public static String getPropertyFromFile( String pathToFile, String property ) {
         // Read property file and return property value, return null if property was not found
         PropertiesConfiguration prop = new PropertiesConfiguration();
         InputStream input = null;
 
         try {
-            input = new FileInputStream(pathToFile);
+            input = new FileInputStream( pathToFile );
 
-            prop.load(input);
+            prop.load( input );
             return prop.getProperty( property ).toString();
 
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             ex.printStackTrace();
-        } catch (ConfigurationException ce) {
+        } catch ( ConfigurationException ce ) {
             ce.printStackTrace();
         }
 
@@ -31,7 +31,7 @@ public class PropertyHandler {
     }
 
 
-    public void setProperty( String file, String property, String value ) {
+    public static void setProperty( String file, String property, String value ) {
         PropertiesConfiguration prop = new PropertiesConfiguration( );
         InputStream input = null;
         OutputStream output = null;
@@ -40,12 +40,12 @@ public class PropertyHandler {
             input = new FileInputStream( file );
 
             prop.load( input );
-            prop.setProperty(property,value);
+            prop.setProperty( property, value );
 
             output = new FileOutputStream( file );
-            prop.save(output, null);
+            prop.save( output, null );
 
-            System.out.println("property \"" + property + "\" is set to value \"" + value + "\" in file \"" + file + "\"" );
+            System.out.println( "property \"" + property + "\" is set to value \"" + value + "\" in file \"" + file + "\"" );
 
         } catch ( IOException ex ) {
             ex.printStackTrace( );
@@ -59,10 +59,10 @@ public class PropertyHandler {
                     e.printStackTrace( );
                 }
             }
-            if ( output != null) {
+            if ( output != null ) {
                 try {
                     output.close();
-                } catch (IOException e) {
+                } catch ( IOException e ) {
                     e.printStackTrace();
                 }
             }

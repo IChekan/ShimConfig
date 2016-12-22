@@ -2,7 +2,7 @@ package modifiers;
 
 import util.PropertyHandler;
 import util.SSHUtils;
-import util.Values;
+import util.ShimValues;
 
 import java.io.File;
 
@@ -12,25 +12,25 @@ import java.io.File;
 public class ModifyPluginConfigProperties {
 
     public void modifyPluginProperties () {
-        if (Values.getSecured()) {
-            SSHUtils.copyFileBySSH(Values.getUser(), Values.getHost(), Values.getPassword(),
-                    "/etc/krb5.conf", Values.getPathToShim() );
+        if (ShimValues.getShimSecured()) {
+            SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
+                    "/etc/krb5.conf", ShimValues.getPathToShim() );
             System.out.println("krb5.conf copied from cluster to shim location. Please move it to appropriate place.");
         }
 
         // Determine shim folder
-        File f = new File(Values.getPathToShim());
+        File f = new File(ShimValues.getPathToShim());
         String shimFolder = f.getName();
         File hadoopConfigurationsFolder = new File(f.getParent());
         String pluginPropertiesFile = hadoopConfigurationsFolder.getParent() + File.separator + "plugin.properties";
-        String configPropertiesFile = Values.getPathToShim() + File.separator + "config.properties";
+        String configPropertiesFile = ShimValues.getPathToShim() + File.separator + "config.properties";
 
         PropertyHandler propertyHandler = new PropertyHandler();
         propertyHandler.setProperty(pluginPropertiesFile, "active.hadoop.configuration", shimFolder);
 
         propertyHandler.setProperty(configPropertiesFile, "pentaho.oozie.proxy.user", "devuser");
 
-        if (Values.getSecured()) {
+        if (ShimValues.getShimSecured()) {
             //determine if shim is using impersonation and modify it accordingly
             if (propertyHandler.getPropertyFromFile(configPropertiesFile,
                     "pentaho.authentication.default.mapping.impersonation.type") == null) {

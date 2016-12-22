@@ -1,4 +1,4 @@
-import util.*;
+import util.ShimValues;
 
 /**
  * Created by Ihar_Chekan on 10/13/2016.
@@ -12,7 +12,7 @@ public class ShimConfigMain {
         }
 
         // Get values from provided file and set properties. Note, that some values are populated after *-site.xml files are downloaded!
-        Values.populateValues( arg[0]);
+        ShimValues.populateValues( arg[0]);
 
         // executes shim config
         ShimConfigRun shimConfigRun = new ShimConfigRun();
