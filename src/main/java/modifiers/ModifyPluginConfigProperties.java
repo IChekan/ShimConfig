@@ -12,7 +12,7 @@ import java.io.File;
 public class ModifyPluginConfigProperties {
 
     public void modifyPluginProperties () {
-        if (ShimValues.getShimSecured()) {
+        if (ShimValues.isShimSecured()) {
             SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
                     "/etc/krb5.conf", ShimValues.getPathToShim() );
             System.out.println("krb5.conf copied from cluster to shim location. Please move it to appropriate place.");
@@ -30,7 +30,7 @@ public class ModifyPluginConfigProperties {
 
         propertyHandler.setProperty(configPropertiesFile, "pentaho.oozie.proxy.user", "devuser");
 
-        if (ShimValues.getShimSecured()) {
+        if (ShimValues.isShimSecured()) {
             //determine if shim is using impersonation and modify it accordingly
             if (propertyHandler.getPropertyFromFile(configPropertiesFile,
                     "pentaho.authentication.default.mapping.impersonation.type") == null) {

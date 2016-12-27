@@ -11,6 +11,9 @@ public final class ShimValues {
     private static String pathToShim;
     private static String pathToTestProperties; //optional
 
+    private static String restUser;
+    private static String restPassword;
+
     //This is gained by parsing the response of the "hadoop version" command
     private static String hadoopVendor;
     private static String hadoopVendorVersion;
@@ -30,12 +33,14 @@ public final class ShimValues {
 
     public static void populateValues ( String pathToConfigFile ) {
         PropertyHandler propertyHandler = new PropertyHandler();
-        sshUser = propertyHandler.getPropertyFromFile( pathToConfigFile , "user");
-        sshHost = propertyHandler.getPropertyFromFile( pathToConfigFile, "host" );
-        sshPassword = propertyHandler.getPropertyFromFile( pathToConfigFile, "password" );
-        pathToShim = propertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" );
+        sshUser = PropertyHandler.getPropertyFromFile( pathToConfigFile , "user");
+        sshHost = PropertyHandler.getPropertyFromFile( pathToConfigFile, "host" );
+        sshPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "password" );
+        pathToShim = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" );
+        restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
+        restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
 
-        String tempPathToTestProperties = propertyHandler.getPropertyFromFile( pathToConfigFile, "pathToTestProperties");
+        String tempPathToTestProperties = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToTestProperties");
         if ( tempPathToTestProperties == null || tempPathToTestProperties.equals("")) {
             pathToTestProperties = null;
         } else pathToTestProperties = tempPathToTestProperties;
@@ -48,8 +53,7 @@ public final class ShimValues {
 
     //determine if shim shimSecured and set appropriate value
     private static void isSecured() {
-        XmlPropertyHandler xmlPropertyHandler = new XmlPropertyHandler();
-        String secured = xmlPropertyHandler.readXmlPropertyValue(pathToShim + "core-site.xml",
+        String secured = XmlPropertyHandler.readXmlPropertyValue(pathToShim + "core-site.xml",
             "hadoop.security.authorization" );
         if (secured == null ) {
         System.out.println("Unable to read 'hadoop.security.authorization' property!!!");
@@ -90,7 +94,7 @@ public final class ShimValues {
         return pathToTestProperties;
     }
 
-    public static boolean getShimSecured() {
+    public static boolean isShimSecured() {
         return shimSecured;
     }
 
@@ -102,4 +106,11 @@ public final class ShimValues {
         return hadoopVendorVersion;
     }
 
+    public static String getRestUser() {
+        return restUser;
+    }
+
+    public static String getRestPassword() {
+        return restPassword;
+    }
 }

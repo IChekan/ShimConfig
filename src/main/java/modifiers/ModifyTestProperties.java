@@ -1,9 +1,9 @@
 package modifiers;
 
-import util.PropertyHandler;
-import util.SSHUtils;
-import util.ShimValues;
-import util.XmlPropertyHandler;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import util.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class ModifyTestProperties {
 
-    private static String[] allClusterNodes;
+    private static ArrayList<String> allClusterNodes = new ArrayList<String>();
 
     public static void modifyAllTestProperties( String pathToTestProperties ) throws IOException {
         setSecuredValue( pathToTestProperties );
@@ -36,7 +36,7 @@ public class ModifyTestProperties {
 
     // set secured value
     private static void setSecuredValue( String pathToTestProperties ) {
-        if ( ShimValues.getShimSecured() ) {
+        if ( ShimValues.isShimSecured() ) {
             PropertyHandler.setProperty( pathToTestProperties, "secure_cluster", "true" );
         } else {
             PropertyHandler.setProperty( pathToTestProperties, "secure_cluster", "false" );
@@ -94,12 +94,44 @@ public class ModifyTestProperties {
     }
 
     // determine hive host and set all values for it
+    //TODO: Refactor this and other methods - need to add interfaces for different hadoop vendors
     private static void setHiveHost( String pathToTestProperties ) {
-        String allClusterNodesGrepHostname =
-                SSHUtils.getCommandResponseBySSH( ShimValues.getSshUser(), ShimValues.getSshHost(),
-                        ShimValues.getSshPassword(), "hdfs dfsadmin -report | grep Hostname" );
-        allClusterNodesGrepHostname = allClusterNodesGrepHostname.replaceAll( "\\r|\\n", "" );
-        allClusterNodes = allClusterNodesGrepHostname.replaceFirst( "Hostname: ", "" ).split( "Hostname: " );
+//        String allClusterNodesGrepHostname =
+//                SSHUtils.getCommandResponseBySSH( ShimValues.getSshUser(), ShimValues.getSshHost(),
+//                        ShimValues.getSshPassword(), "hdfs dfsadmin -report | grep Hostname" );
+//        allClusterNodesGrepHostname = allClusterNodesGrepHostname.replaceAll( "\\r|\\n", "" );
+//        allClusterNodes = allClusterNodesGrepHostname.replaceFirst( "Hostname: ", "" ).split( "Hostname: " );
+        if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
+            String allClusterNodesFromRest = RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/hosts",
+                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC, null, null, null );
+            try {
+                JSONObject obj = new JSONObject( allClusterNodesFromRest );
+                JSONArray arr = obj.getJSONArray( "items" );
+                for ( int i = 0; i < arr.length(); i++ ) {
+                    JSONObject obj2 = arr.getJSONObject( i );
+                    String hostname = obj2.getString( "hostname" );
+                    allClusterNodes.add( hostname );
+                }
+            } catch ( JSONException e ) {
+                System.out.println( "JSON exception: " + e );
+            }
+        } else {
+            String allClusterNodesFromRest = RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/hosts",
+                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC, null, null, null );
+            try {
+                JSONObject obj = new JSONObject( allClusterNodesFromRest );
+                JSONArray arr = obj.getJSONArray( "items" );
+                for ( int i = 0; i < arr.length(); i++ ) {
+                    JSONObject obj2 = arr.getJSONObject( i );
+                    JSONObject obj3 = obj2.getJSONObject( "Hosts" );
+                    String hostname = obj3.getString( "host_name" );
+                    allClusterNodes.add( hostname );
+                }
+            } catch ( JSONException e ) {
+                System.out.println( "JSON exception: " + e );
+            }
+        }
+
         String hiveServerNode = "";
         for ( String node : allClusterNodes ) {
             if ( SSHUtils.getCommandResponseBySSH( ShimValues.getSshUser(), node, ShimValues.getSshPassword(),
@@ -117,7 +149,7 @@ public class ModifyTestProperties {
             System.out.println( "Hive node was not determined!!!" );
         }
         //if secured - add hive principal
-        if ( ShimValues.getShimSecured() ) {
+        if ( ShimValues.isShimSecured() ) {
             String[] hivePrincipalTemp1 =
                     XmlPropertyHandler.readXmlPropertyValue( ShimValues.getPathToShim() + "hive-site.xml",
                             "hive.metastore.kerberos.principal" ).split( "/" );
@@ -128,7 +160,7 @@ public class ModifyTestProperties {
             PropertyHandler.setProperty( pathToTestProperties, "hive2_principal", hivePrincipal );
             //If vendor is cdh - adding Impala secured properties, same as for hive
             if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
-                if ( ShimValues.getShimSecured() ) {
+                if ( ShimValues.isShimSecured() ) {
                     PropertyHandler.setProperty( pathToTestProperties, "impala_KrbRealm", hivePrincipalTemp2[ 1 ] );
                     PropertyHandler.setProperty( pathToTestProperties, "impala_KrbHostFQDN", hiveServerNode );
                 }
