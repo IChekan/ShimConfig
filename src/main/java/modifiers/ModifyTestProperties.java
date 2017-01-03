@@ -271,8 +271,8 @@ public class ModifyTestProperties {
     //modifying allow_text_splitter value
     private static void setTextSplitter( String pathToTestProperties ) {
         if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "hdp" )
-                && ShimValues.getHadoopVendorVersion().equalsIgnoreCase( "hdp25" )) {
-            PropertyHandler.setProperty( pathToTestProperties, "allow_text_splitter", "Dorg.apache.sqoop.splitter.allow_text_splitter" );
+                && ShimValues.getHadoopVendorVersion().equalsIgnoreCase( "25" )) {
+            PropertyHandler.setProperty( pathToTestProperties, "allow_text_splitter", "org.apache.sqoop.splitter.allow_text_splitter" );
             PropertyHandler.setProperty( pathToTestProperties, "allow_text_splitter_value", "true" );
         }
         else {
