@@ -19,7 +19,11 @@ public class PropertyHandler {
             input = new FileInputStream( pathToFile );
 
             prop.load( input );
-            return prop.getProperty( property ).toString();
+            Object resProperty = prop.getProperty( property );
+            if ( resProperty == null ) {
+                return null;
+            }
+            return resProperty.toString();
 
         } catch ( IOException ex ) {
             ex.printStackTrace();
