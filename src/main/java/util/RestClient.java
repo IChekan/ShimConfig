@@ -1,14 +1,16 @@
 package util;
 
-import com.sun.istack.internal.Nullable;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.client.apache.ApacheHttpClient;
+import org.apache.commons.io.IOUtils;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +33,8 @@ public class RestClient {
         BASIC
     }
 
-    public static String callRest (String requestUrl, HttpMethod httpMethod, AuthMethod authMethod,
+    public static byte[] callRest( String requestUrl, HttpMethod httpMethod, AuthMethod authMethod,
+                                   @Nullable String restUser, @Nullable String restPassword,
                                    @Nullable MediaType mediaType, @Nullable HashMap<String, String> header,
                                    @Nullable String bodyValue ) {
 
@@ -39,9 +42,9 @@ public class RestClient {
         Client client = ApacheHttpClient.create();
         switch ( authMethod ) {
             case BASIC:
-            HTTPBasicAuthFilter basicAuthFilter = new HTTPBasicAuthFilter(ShimValues.getRestUser(), ShimValues.getRestPassword());
-            client.addFilter(basicAuthFilter);
-            break;
+                HTTPBasicAuthFilter basicAuthFilter = new HTTPBasicAuthFilter( restUser, restPassword );
+                client.addFilter( basicAuthFilter );
+                break;
         }
         // create a WebResource object, which encapsulates a web resource for the client
         WebResource webResource = client.resource( requestUrl );
@@ -49,37 +52,67 @@ public class RestClient {
 
         // Add headers
         if ( header != null ) {
-            for (Map.Entry<String, String> entry : header.entrySet()) {
-                builder = builder.header(entry.getKey(), entry.getValue());
+            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                builder = builder.header( entry.getKey(), entry.getValue() );
             }
         }
 
-        ClientResponse response = null;
+        byte[] response = null;
         try {
             switch ( httpMethod ) {
                 case HTTP_METHOD_GET:
-                    response = builder.get(ClientResponse.class);
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.get( ClientResponse.class ).getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
                 case HTTP_METHOD_POST:
-                    response = builder.type( mediaType ).post( ClientResponse.class, bodyValue );
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.type( mediaType ).post( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
                 case HTTP_METHOD_PUT:
-                    response = builder.type( mediaType ).put( ClientResponse.class, bodyValue );
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.type( mediaType ).put( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
                 case HTTP_METHOD_DELETE:
-                    response = builder.type( mediaType ).delete( ClientResponse.class, bodyValue );
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.type( mediaType ).delete( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
                 case HTTP_METHOD_HEAD:
-                    response = builder.head();
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.head().getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
                 case HTTP_METHOD_OPTIONS:
-                    response = builder.options( ClientResponse.class );
+                    try {
+                        response = IOUtils
+                                .toByteArray( builder.options( ClientResponse.class ).getEntityInputStream() );
+                    } catch ( IOException e ) {
+                        e.printStackTrace();
+                    }
                     break;
             }
         } catch ( UniformInterfaceException u ) {
-            response = u.getResponse();
+            System.out.println( u.getResponse().getStatus() );
         }
-        return response.getEntity( String.class );
+        return response;
     }
 
 }

@@ -94,16 +94,12 @@ public class ModifyTestProperties {
     }
 
     // determine hive host and set all values for it
-    //TODO: Refactor this and other methods - need to add interfaces for different hadoop vendors
+    //TODO: Refactor this and other methods - need to create interface(abstract class?) for different hadoop vendors
     private static void setHiveHost( String pathToTestProperties ) {
-//        String allClusterNodesGrepHostname =
-//                SSHUtils.getCommandResponseBySSH( ShimValues.getSshUser(), ShimValues.getSshHost(),
-//                        ShimValues.getSshPassword(), "hdfs dfsadmin -report | grep Hostname" );
-//        allClusterNodesGrepHostname = allClusterNodesGrepHostname.replaceAll( "\\r|\\n", "" );
-//        allClusterNodes = allClusterNodesGrepHostname.replaceFirst( "Hostname: ", "" ).split( "Hostname: " );
         if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
-            String allClusterNodesFromRest = RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/hosts",
-                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC, null, null, null );
+            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/hosts",
+                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                    ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
                 JSONObject obj = new JSONObject( allClusterNodesFromRest );
                 JSONArray arr = obj.getJSONArray( "items" );
@@ -116,8 +112,9 @@ public class ModifyTestProperties {
                 System.out.println( "JSON exception: " + e );
             }
         } else {
-            String allClusterNodesFromRest = RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/hosts",
-                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC, null, null, null );
+            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/hosts",
+                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                    ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
                 JSONObject obj = new JSONObject( allClusterNodesFromRest );
                 JSONArray arr = obj.getJSONArray( "items" );
@@ -131,7 +128,6 @@ public class ModifyTestProperties {
                 System.out.println( "JSON exception: " + e );
             }
         }
-
         String hiveServerNode = "";
         for ( String node : allClusterNodes ) {
             if ( SSHUtils.getCommandResponseBySSH( ShimValues.getSshUser(), node, ShimValues.getSshPassword(),
@@ -150,21 +146,108 @@ public class ModifyTestProperties {
         }
         //if secured - add hive principal
         if ( ShimValues.isShimSecured() ) {
-            String[] hivePrincipalTemp1 =
-                    XmlPropertyHandler.readXmlPropertyValue( ShimValues.getPathToShim() + "hive-site.xml",
-                            "hive.metastore.kerberos.principal" ).split( "/" );
-            String[] hivePrincipalTemp2 = hivePrincipalTemp1[ 1 ].split( "@" );
-            String hivePrincipal = hivePrincipalTemp1[ 0 ] + "/" + hiveServerNode + "@" + hivePrincipalTemp2[ 1 ];
-
-            PropertyHandler.setProperty( pathToTestProperties, "hive2_option", "principal" );
-            PropertyHandler.setProperty( pathToTestProperties, "hive2_principal", hivePrincipal );
-            //If vendor is cdh - adding Impala secured properties, same as for hive
             if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
-                if ( ShimValues.isShimSecured() ) {
-                    PropertyHandler.setProperty( pathToTestProperties, "impala_KrbRealm", hivePrincipalTemp2[ 1 ] );
-                    PropertyHandler.setProperty( pathToTestProperties, "impala_KrbHostFQDN", hiveServerNode );
+                String cmCluster = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/clusters",
+                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
+                String cluster = "";
+                try {
+                    JSONObject obj = new JSONObject( cmCluster );
+                    cluster = obj.getJSONArray( "items" ).getJSONObject( 0 ).getString( "name" );
+                } catch ( JSONException e ) {
+                    System.out.println( "JSON exception: " + e );
                 }
+
+                byte[] zipFromCM = RestClient.callRest( "http://" + ShimValues.getSshHost()
+                                + ":7180/api/v10/clusters/" + cluster + "/services/hive/clientConfig",
+                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null );
+
+                File tempHiveSiteXML = null;
+                try {
+                    tempHiveSiteXML = ShimFileUtils.getFileFromZipAndSaveAsTempFile( zipFromCM, "hive-site.xml" );
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+
+                String[] hivePrincipalTemp1 = XmlPropertyHandler.readXmlPropertyValue( tempHiveSiteXML.getAbsolutePath(),
+                        "hive.metastore.kerberos.principal" ).split( "/" );
+
+                String[] hivePrincipalTemp2 = hivePrincipalTemp1[ 1 ].split( "@" );
+                String hivePrincipal = hivePrincipalTemp1[ 0 ] + "/" + hiveServerNode + "@" + hivePrincipalTemp2[ 1 ];
+                String fullImpalaConfig =
+                        new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/clusters/" + cluster
+                                        + "/services/impala/config?view=FULL", RestClient.HttpMethod.HTTP_METHOD_GET,
+                                RestClient.AuthMethod.BASIC, ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null,
+                                null ) );
+
+                String impalaKrbServiceName = "";
+                try {
+                    JSONObject obj = new JSONObject( fullImpalaConfig );
+                    JSONArray arr = obj.getJSONArray( "items" );
+                    for ( int i = 0; i < arr.length(); i++ ) {
+                        if ( arr.getJSONObject( i ).getString( "name" ).equalsIgnoreCase( "kerberos_princ_name" ) ) {
+                            JSONObject obj2 = arr.getJSONObject( i );
+                            impalaKrbServiceName = obj2.getString( "default" );
+                            break;
+                        }
+                    }
+                } catch ( JSONException e ) {
+                    System.out.println( "JSON exception: " + e );
+                }
+
+                PropertyHandler.setProperty( pathToTestProperties, "hive2_option", "principal" );
+                PropertyHandler.setProperty( pathToTestProperties, "hive2_principal", hivePrincipal );
+                PropertyHandler.setProperty( pathToTestProperties, "impala_KrbRealm", hivePrincipalTemp2[ 1 ] );
+                PropertyHandler.setProperty( pathToTestProperties, "impala_KrbHostFQDN", hiveServerNode );
+                PropertyHandler.setProperty( pathToTestProperties, "impala_KrbServiceName", impalaKrbServiceName );
+            } else {
+                String ambariCluster = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/clusters/",
+                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
+                String cluster = "";
+                try {
+                    JSONObject obj = new JSONObject( ambariCluster );
+                    cluster =
+                            obj.getJSONArray( "items" ).getJSONObject( 0 ).getJSONObject( "Clusters" ).getString( "cluster_name" );
+                } catch ( JSONException e ) {
+                    System.out.println( "JSON exception: " + e );
+                }
+
+                String ambariHive = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/clusters/"
+                                + cluster + "/configurations/service_config_versions?service_name.in(HIVE)&is_current=true",
+                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
+
+                String ambariPrincipal = "";
+                try {
+                    JSONObject obj = new JSONObject( ambariHive );
+                    JSONArray arr = obj.getJSONArray( "items" ).getJSONObject( 0 ).getJSONArray( "configurations" );
+                    for ( int i = 0; i < arr.length(); i++ ) {
+                        if ( arr.getJSONObject( i ).getString( "type" ).equalsIgnoreCase( "hive-site" ) ) {
+                            JSONObject obj2 = arr.getJSONObject( i ).getJSONObject( "properties" );
+                            ambariPrincipal = obj2.getString( "hive.metastore.kerberos.principal" );
+                            break;
+                        }
+                    }
+                } catch ( JSONException e ) {
+                    System.out.println( "JSON exception: " + e );
+                }
+
+                String[] hivePrincipalTemp1 = ambariPrincipal.split( "/" );
+                String[] hivePrincipalTemp2 = hivePrincipalTemp1[ 1 ].split( "@" );
+                String hivePrincipal = hivePrincipalTemp1[ 0 ] + "/" + hiveServerNode + "@" + hivePrincipalTemp2[ 1 ];
+
+                PropertyHandler.setProperty( pathToTestProperties, "hive2_option", "principal" );
+                PropertyHandler.setProperty( pathToTestProperties, "hive2_principal", hivePrincipal );
+
             }
+        } else {
+            PropertyHandler.setProperty( pathToTestProperties, "hive2_option", "" );
+            PropertyHandler.setProperty( pathToTestProperties, "hive2_principal", "" );
+            PropertyHandler.setProperty( pathToTestProperties, "impala_KrbRealm", "" );
+            PropertyHandler.setProperty( pathToTestProperties, "impala_KrbHostFQDN", "" );
+            PropertyHandler.setProperty( pathToTestProperties, "impala_KrbServiceName", "" );
         }
     }
 
@@ -205,7 +288,7 @@ public class ModifyTestProperties {
                     "hbase.zookeeper.property.clientPort" );
         }
 
-        if ( zkQuorum.equalsIgnoreCase( "" ) || zkPort.equalsIgnoreCase( "" ) ) {
+        if ( zkQuorumRes.equalsIgnoreCase( "" ) || zkPort.equalsIgnoreCase( "" ) ) {
             System.out.println( "Both \"hadoop.registry.zk.quorum\" or \"hadoop.registry.zk.quorum\" properties "
                     + "was not found in \"yarn-site.xml\" and \"hbase.zookeeper.quorum\" was not helpful as well... " );
         }
@@ -254,6 +337,11 @@ public class ModifyTestProperties {
                     .setProperty( pathToTestProperties, "spark_driver_extraJavaOptions", "-Dhdp.version=" + hdpVersion );
             PropertyHandler
                     .setProperty( pathToTestProperties, "spark_yarn_am_extraJavaOptions", "-Dhdp.version=" + hdpVersion );
+        } else {
+            PropertyHandler
+                    .setProperty( pathToTestProperties, "spark_driver_extraJavaOptions", "" );
+            PropertyHandler
+                    .setProperty( pathToTestProperties, "spark_yarn_am_extraJavaOptions", "" );
         }
     }
 
@@ -283,7 +371,7 @@ public class ModifyTestProperties {
 
     //set sqoop_secure_libjar_path
     private static void setSqoopSecureLibjarPath ( String pathToTestProperties ) throws IOException {
-        String filename = Files.find( Paths.get( ShimValues.getPathToShim() + "lib" ) , 1 , (p, bfa ) -> bfa.isRegularFile()
+        String filename = Files.find( Paths.get( ShimValues.getPathToShim() + File.separator + "lib" ) , 1 , (p, bfa ) -> bfa.isRegularFile()
                 && p.getFileName().toString().matches( "pentaho-hadoop-shims-.+?-security-.+?\\.jar" ) ).findFirst().get().toString();
 
         PropertyHandler.setProperty( pathToTestProperties, "sqoop_secure_libjar_path", filename );

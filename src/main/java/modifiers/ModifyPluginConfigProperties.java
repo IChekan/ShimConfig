@@ -25,30 +25,29 @@ public class ModifyPluginConfigProperties {
         String pluginPropertiesFile = hadoopConfigurationsFolder.getParent() + File.separator + "plugin.properties";
         String configPropertiesFile = ShimValues.getPathToShim() + File.separator + "config.properties";
 
-        PropertyHandler propertyHandler = new PropertyHandler();
-        propertyHandler.setProperty(pluginPropertiesFile, "active.hadoop.configuration", shimFolder);
+        PropertyHandler.setProperty(pluginPropertiesFile, "active.hadoop.configuration", shimFolder);
 
-        propertyHandler.setProperty(configPropertiesFile, "pentaho.oozie.proxy.user", "devuser");
+        PropertyHandler.setProperty(configPropertiesFile, "pentaho.oozie.proxy.user", "devuser");
 
         if (ShimValues.isShimSecured()) {
             //determine if shim is using impersonation and modify it accordingly
-            if (propertyHandler.getPropertyFromFile(configPropertiesFile,
+            if (PropertyHandler.getPropertyFromFile(configPropertiesFile,
                     "pentaho.authentication.default.mapping.impersonation.type") == null) {
-                propertyHandler.setProperty(configPropertiesFile, "authentication.superuser.provider", "kerberos");
-                propertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.id", "kerberos");
-                propertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.principal", "devuser@PENTAHOQA.COM");
-                propertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.password", "password");
+                PropertyHandler.setProperty(configPropertiesFile, "authentication.superuser.provider", "kerberos");
+                PropertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.id", "kerberos");
+                PropertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.principal", "devuser@PENTAHOQA.COM");
+                PropertyHandler.setProperty(configPropertiesFile, "authentication.kerberos.password", "password");
             }
             else {
-                propertyHandler.setProperty(configPropertiesFile,
+                PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.kerberos.principal", "devuser@PENTAHOQA.COM");
-                propertyHandler.setProperty(configPropertiesFile,
+                PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.kerberos.password", "password");
-                propertyHandler.setProperty(configPropertiesFile,
+                PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.impersonation.type", "simple");
-                propertyHandler.setProperty(configPropertiesFile,
+                PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.server.credentials.kerberos.principal", "devuser@PENTAHOQA.COM");
-                propertyHandler.setProperty(configPropertiesFile,
+                PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.server.credentials.kerberos.password", "password");
             }
         }

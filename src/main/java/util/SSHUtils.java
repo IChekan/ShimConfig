@@ -18,7 +18,7 @@ public class SSHUtils {
         try{
             String prefix=null;
             if(new File(whereToSaveFile).isDirectory()){
-            prefix=whereToSaveFile+File.separator;
+            prefix=whereToSaveFile;
             }
 
             JSch jsch=new JSch();

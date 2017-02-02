@@ -1,5 +1,7 @@
 package util;
 
+import java.io.File;
+
 /**
  * Created by Ihar_Chekan on 10/14/2016.
  */
@@ -31,12 +33,11 @@ public final class ShimValues {
         "/etc/hive/conf/hive-site.xml"
     };
 
-    public static void populateValues ( String pathToConfigFile ) {
-        PropertyHandler propertyHandler = new PropertyHandler();
+    public static void populateValuesFromFile ( String pathToConfigFile ) {
         sshUser = PropertyHandler.getPropertyFromFile( pathToConfigFile , "user");
         sshHost = PropertyHandler.getPropertyFromFile( pathToConfigFile, "host" );
         sshPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "password" );
-        pathToShim = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" );
+        pathToShim = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" ) + File.separator;
         restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
 
@@ -44,6 +45,16 @@ public final class ShimValues {
         if ( tempPathToTestProperties == null || tempPathToTestProperties.equals("")) {
             pathToTestProperties = null;
         } else pathToTestProperties = tempPathToTestProperties;
+    }
+
+    public static void populateValues(String[] configs ) {
+        pathToShim = configs[0];
+        sshHost = configs[1];
+        sshUser = configs[2];
+        sshPassword = configs[3];
+        restUser = configs[4];
+        restPassword = configs[5];
+        pathToTestProperties = configs[6];
     }
 
     public static void populateValuesAfterDownloading(){

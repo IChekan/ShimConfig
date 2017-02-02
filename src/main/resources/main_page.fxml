@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="585.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainPage">
+   <children>
+      <Button id="buttonOpenShim" fx:id="buttonOpenShim" layoutX="492.0" layoutY="44.0" mnemonicParsing="false" onAction="#buttonInit" text="Open..." />
+      <Button id="buttonOpenTestProperties" fx:id="buttonOpenTestProperties" layoutX="492.0" layoutY="310.0" mnemonicParsing="false" onAction="#buttonInit" text="Open..." />
+      <TextField id="pathToShim" fx:id="pathToShim" layoutX="39.0" layoutY="44.0" prefHeight="31.0" prefWidth="417.0" promptText="path to Shim" />
+      <TextField id="cluster_node_FQDN" fx:id="cluster_node_FQDN" layoutX="39.0" layoutY="100.0" prefHeight="31.0" prefWidth="417.0" promptText="host (example: svqxbdcn6cdh59n1.pentahoqa.com )" />
+      <TextField id="sshUser" fx:id="sshUser" layoutX="38.0" layoutY="158.0" prefHeight="31.0" prefWidth="244.0" promptText="ssh user (default &quot;devuser&quot;)" />
+      <PasswordField id="sshPassword" fx:id="sshPassword" layoutX="38.0" layoutY="211.0" prefHeight="31.0" prefWidth="244.0" promptText="ssh password (default &quot;password&quot;)" />
+      <TextField id="restUser" fx:id="restUser" layoutX="315.0" layoutY="158.0" prefHeight="31.0" prefWidth="244.0" promptText="REST user (default &quot;admin&quot;)" />
+      <PasswordField id="restPassword" fx:id="restPassword" layoutX="315.0" layoutY="211.0" prefHeight="31.0" prefWidth="244.0" promptText="REST password (&quot;default admin&quot;)" />
+      <TextField id="testPropertiesPath" fx:id="testPropertiesPath" layoutX="39.0" layoutY="310.0" prefHeight="31.0" prefWidth="417.0" promptText="optional path to test.properties file" />
+      <Button id="buttonStart" fx:id="buttonStart" layoutX="199.0" layoutY="262.0" mnemonicParsing="false" onAction="#buttonInit" prefHeight="31.0" prefWidth="205.0" text="Start" />
+      <!---->
+      <!--<Button id="buttonSetDefaults" fx:id="buttonSetDefaults" focusTraversable="false" layoutX="371.0" layoutY="416.0" mnemonicParsing="false" onAction="#buttonInit" prefHeight="31.0" prefWidth="170.0" text="Set defaults" />-->
+      <!--<ChoiceBox id="shimChoice" fx:id="shimChoice" focusTraversable="false" layoutX="39.0" layoutY="416.0" prefHeight="31.0" prefWidth="244.0" />-->
+      <!--<Text layoutX="34.0" layoutY="400.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You can select pre-defined cluster and set default values." textAlignment="CENTER" wrappingWidth="497.0000011920929" />-->
+      <!---->
+   </children>
+</AnchorPane>
