@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.2-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.2-jar-with-dependencies.jar/download
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
 For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
