@@ -58,11 +58,11 @@ public class ShimConfigMain extends Application {
             launch(args);
         }
         else if (args.length == 1) {
-            ShimValues.populateValuesFromFile( args[0]);
+            ShimValues.populateValues( args[0]);
             main.ShimConfigRun shimConfigRun = new main.ShimConfigRun();
             shimConfigRun.shimConfigRun();
         } else if (args.length == 6 || args.length == 7) {
-            ShimValues.populateValues(args);
+            ShimValues.populateValues( args );
         }
         else {
             System.err.println("Use UI version or " +

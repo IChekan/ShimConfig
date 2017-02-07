@@ -33,11 +33,16 @@ public final class ShimValues {
         "/etc/hive/conf/hive-site.xml"
     };
 
-    public static void populateValuesFromFile ( String pathToConfigFile ) {
+    public static void populateValues( String pathToConfigFile ) {
         sshUser = PropertyHandler.getPropertyFromFile( pathToConfigFile , "user");
         sshHost = PropertyHandler.getPropertyFromFile( pathToConfigFile, "host" );
         sshPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "password" );
-        pathToShim = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" ) + File.separator;
+        String pathToShimTemp = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" );
+        if ( pathToShimTemp.substring(pathToShimTemp.length() - 1).equalsIgnoreCase(File.separator) ) {
+            pathToShim = pathToShimTemp;
+        } else {
+            pathToShim = pathToShimTemp + File.separator;
+        }
         restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
 
@@ -48,7 +53,11 @@ public final class ShimValues {
     }
 
     public static void populateValues(String[] configs ) {
-        pathToShim = configs[0];
+        if ( configs[0].substring(configs[0].length() - 1).equalsIgnoreCase(File.separator) ) {
+            pathToShim = configs[0];
+        } else {
+            pathToShim = configs[0] + File.separator;
+        }
         sshHost = configs[1];
         sshUser = configs[2];
         sshPassword = configs[3];

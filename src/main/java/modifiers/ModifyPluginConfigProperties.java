@@ -23,7 +23,7 @@ public class ModifyPluginConfigProperties {
         String shimFolder = f.getName();
         File hadoopConfigurationsFolder = new File(f.getParent());
         String pluginPropertiesFile = hadoopConfigurationsFolder.getParent() + File.separator + "plugin.properties";
-        String configPropertiesFile = ShimValues.getPathToShim() + File.separator + "config.properties";
+        String configPropertiesFile = ShimValues.getPathToShim() + "config.properties";
 
         PropertyHandler.setProperty(pluginPropertiesFile, "active.hadoop.configuration", shimFolder);
 
@@ -46,7 +46,7 @@ public class ModifyPluginConfigProperties {
                 PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.impersonation.type", "simple");
                 PropertyHandler.setProperty(configPropertiesFile,
-                        "pentaho.authentication.default.mapping.server.credentials.kerberos.principal", "devuser@PENTAHOQA.COM");
+                        "pentaho.authentication.default.mapping.server.credentials.kerberos.principal", "hive@PENTAHOQA.COM");
                 PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.server.credentials.kerberos.password", "password");
             }
