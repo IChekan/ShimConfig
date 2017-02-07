@@ -3,12 +3,12 @@ This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.2-jar-with-dependencies.jar/download
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
-For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
-For console run, there are two methods: 
-1.	“java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)
-2.	“java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
+- For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
+- For console run, there are two methods:
+1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)
+2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
 It does:
--	Modifies all necessary settings in plugin.properties
+-   Modifies all necessary settings in plugin.properties
 -	Modifies all necessary settings in config.properties, including Kerberos settings before/after impersonation 
 -	Copies all necessary *.-site.xml files from cluster
 -	Adds “cross-platform” to mapred-site.xml
@@ -25,9 +25,9 @@ It does NOT configure:
 
 
 Changelog:
-1.0.1:
+- 1.0.1:
 Added detection of separator at the end of the path to the shim.
-1.0.2:
+- 1.0.2:
 Impala and MySql Drivers copy fixed.
 Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.
 
