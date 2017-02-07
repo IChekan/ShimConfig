@@ -63,6 +63,7 @@ public class MainPage {
             System.out.println("One or more required field(s) is empty! Only test.properties field is not required!");
         }
         else {
+            buttonStart.setDisable( true );
             String[] values = new String[7];
             values[0] = pathToShim.getText();
             values[1] = cluster_node_FQDN.getText();
@@ -79,7 +80,6 @@ public class MainPage {
                     shimConfigRun.shimConfigRun();
                 }
             };
-            buttonStart.setDisable( true );
             thread.start();
         }
     }
