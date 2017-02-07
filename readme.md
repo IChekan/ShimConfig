@@ -8,8 +8,8 @@ The utility have GUI and console running modes. It works on both Windows and Lin
 For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
 
 For console run, there are two methods:
-1.  “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)
-2.  “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
+1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)
+2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
 
 It does:
 -   Modifies all necessary settings in plugin.properties
