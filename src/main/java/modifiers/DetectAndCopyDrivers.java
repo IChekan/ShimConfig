@@ -28,7 +28,7 @@ public class DetectAndCopyDrivers {
                                     File.separator + impalaSimbaDriverPath.getFileName()));
                 }
             } catch (FileAlreadyExistsException ee) {
-                System.out.println("Impala Simba driver already exists in shim folder");
+                System.out.println("Impala Simba driver already exists in the shim folder");
             } catch (IOException e) {
                 System.out.println("IOexception while copying impala simba driver" + e);
             } catch (Exception e) {
@@ -64,7 +64,7 @@ public class DetectAndCopyDrivers {
                 }
             }
         } catch (FileAlreadyExistsException ee) {
-            System.out.println("MySQL driver already exists destination folder");
+            System.out.println("MySQL driver already exists in the destination folder");
         } catch (IOException e) {
             System.out.println("IOexception while copying MySQL driver" + e);
         } catch (Exception e) {
