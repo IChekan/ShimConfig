@@ -36,4 +36,4 @@ Added detection of separator at the end of the path to the shim.
 - 1.0.2:
 Impala and MySql Drivers copy fixed.
 Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.
-
+Now button "Start" is disabled after starting
