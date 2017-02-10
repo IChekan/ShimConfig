@@ -26,9 +26,11 @@ public class PropertyHandler {
             return resProperty.toString();
 
         } catch ( IOException ex ) {
-            ex.printStackTrace();
+            System.out.println("IOException: " + ex);
+            //ex.printStackTrace();
         } catch ( ConfigurationException ce ) {
-            ce.printStackTrace();
+            System.out.println("ConfigurationException: " + ce);
+            //ce.printStackTrace();
         }
 
         return null;
@@ -41,6 +43,7 @@ public class PropertyHandler {
         OutputStream output = null;
 
         try {
+//            System.out.println( "property \"" + property + "\" is trying to set to value \"" + value + "\" in file \"" + file + "\"" );
             input = new FileInputStream( file );
 
             prop.load( input );
@@ -52,22 +55,26 @@ public class PropertyHandler {
             System.out.println( "property \"" + property + "\" is set to value \"" + value + "\" in file \"" + file + "\"" );
 
         } catch ( IOException ex ) {
-            ex.printStackTrace( );
+            System.out.println("IOException: " + ex);
+            //ex.printStackTrace( );
         } catch ( ConfigurationException ce ) {
-            ce.printStackTrace();
+            System.out.println("ConfigurationException: " + ce);
+            //ce.printStackTrace();
         } finally {
             if ( input != null ) {
                 try {
                     input.close( );
                 } catch ( IOException e ) {
-                    e.printStackTrace( );
+                    System.out.println("IOException: " + e);
+                    //e.printStackTrace( );
                 }
             }
             if ( output != null ) {
                 try {
                     output.close();
                 } catch ( IOException e ) {
-                    e.printStackTrace();
+                    System.out.println("IOException: " + e);
+                    //e.printStackTrace();
                 }
             }
         }

@@ -179,7 +179,7 @@ public class SSHUtils {
 //                    System.out.println("exit-status: "+channel.getExitStatus());
                     break;
                 }
-                try{Thread.sleep(1000);}catch(Exception ee){}
+                try{Thread.sleep(1000);}catch(Exception ee){System.out.println(ee);}
             }
             channel.disconnect();
             session.disconnect();

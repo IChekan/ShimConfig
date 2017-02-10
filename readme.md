@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.2-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.3-jar-with-dependencies.jar/download
 
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
@@ -36,4 +36,10 @@ Added detection of separator at the end of the path to the shim.
 - 1.0.2:
 Impala and MySql Drivers copy fixed.
 Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.
-Now button "Start" is disabled after starting
+Now button "Start" is disabled after starting.
+- 1.0.3:
+RestHost property added for Microsift Azure shim. (config for this shim does NOT work for now).
+SqoopSecureLibjarPath disabled for unsecure cluster.
+kinit disabled for unsecure cluster.
+
+

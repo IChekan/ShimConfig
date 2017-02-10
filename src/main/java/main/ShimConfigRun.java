@@ -16,9 +16,6 @@ class ShimConfigRun {
 
     public void shimConfigRun () {
 
-        SSHUtils.getCommandResponseBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
-                "echo password | kinit");
-
         for (int i = 0; i < ShimValues.getFilesToRetrieve().length; i++) {
             SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
                     ShimValues.getFilesToRetrieve()[i], ShimValues.getPathToShim());
@@ -26,6 +23,11 @@ class ShimConfigRun {
 
         //set Values after copying the *-site.xml files
         ShimValues.populateValuesAfterDownloading();
+
+        if (ShimValues.isShimSecured()) {
+            SSHUtils.getCommandResponseBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
+                "echo password | kinit");
+        }
 
         // Adding cross-platform to mapred-site.xml
         AddCrossPlatform addCrossPlatform = new AddCrossPlatform();
@@ -41,7 +43,7 @@ class ShimConfigRun {
                 ModifyTestProperties.modifyAllTestProperties(ShimValues.getPathToTestProperties());
             }
         } catch ( ArrayIndexOutOfBoundsException e) {
-            // do nothing
+            System.out.println( "ArrayIndexOutOfBoundsException: " + e );
         } catch ( IOException e ) {
             System.out.println( "IOexception: " + e );
         }
@@ -50,7 +52,7 @@ class ShimConfigRun {
         DetectAndCopyDrivers.copyImpalaSimbaDriver();
         DetectAndCopyDrivers.copyMySqlDriver();
 
-        System.out.println("Finished. Please check log to be sure all is ok.");
+        System.out.println("Finished. Please check the log above to be sure all is ok.");
         System.exit(0);
     }
 }

@@ -30,7 +30,9 @@ public class ModifyTestProperties {
         setSpark( pathToTestProperties );
         setHdpVersion();
         setTextSplitter( pathToTestProperties );
-        setSqoopSecureLibjarPath ( pathToTestProperties );
+        if (ShimValues.isShimSecured()) {
+            setSqoopSecureLibjarPath(pathToTestProperties);
+        }
     }
 
 
@@ -97,7 +99,7 @@ public class ModifyTestProperties {
     //TODO: Refactor this and other methods - need to create interface(abstract class?) for different hadoop vendors
     private static void setHiveHost( String pathToTestProperties ) {
         if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
-            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/hosts",
+            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/hosts",
                     RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                     ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
@@ -112,7 +114,7 @@ public class ModifyTestProperties {
                 System.out.println( "JSON exception: " + e );
             }
         } else {
-            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/hosts",
+            String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/hosts",
                     RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                     ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
@@ -147,7 +149,7 @@ public class ModifyTestProperties {
         //if secured - add hive principal
         if ( ShimValues.isShimSecured() ) {
             if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
-                String cmCluster = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/clusters",
+                String cmCluster = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/clusters",
                         RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
                 String cluster = "";
@@ -158,7 +160,7 @@ public class ModifyTestProperties {
                     System.out.println( "JSON exception: " + e );
                 }
 
-                byte[] zipFromCM = RestClient.callRest( "http://" + ShimValues.getSshHost()
+                byte[] zipFromCM = RestClient.callRest( "http://" + ShimValues.getRestHost()
                                 + ":7180/api/v10/clusters/" + cluster + "/services/hive/clientConfig",
                         RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null );
@@ -176,7 +178,7 @@ public class ModifyTestProperties {
                 String[] hivePrincipalTemp2 = hivePrincipalTemp1[ 1 ].split( "@" );
                 String hivePrincipal = hivePrincipalTemp1[ 0 ] + "/" + hiveServerNode + "@" + hivePrincipalTemp2[ 1 ];
                 String fullImpalaConfig =
-                        new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":7180/api/v10/clusters/" + cluster
+                        new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/clusters/" + cluster
                                         + "/services/impala/config?view=FULL", RestClient.HttpMethod.HTTP_METHOD_GET,
                                 RestClient.AuthMethod.BASIC, ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null,
                                 null ) );
@@ -202,7 +204,7 @@ public class ModifyTestProperties {
                 PropertyHandler.setProperty( pathToTestProperties, "impala_KrbHostFQDN", hiveServerNode );
                 PropertyHandler.setProperty( pathToTestProperties, "impala_KrbServiceName", impalaKrbServiceName );
             } else {
-                String ambariCluster = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/clusters/",
+                String ambariCluster = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/clusters/",
                         RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
                 String cluster = "";
@@ -214,7 +216,7 @@ public class ModifyTestProperties {
                     System.out.println( "JSON exception: " + e );
                 }
 
-                String ambariHive = new String( RestClient.callRest( "http://" + ShimValues.getSshHost() + ":8080/api/v1/clusters/"
+                String ambariHive = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/clusters/"
                                 + cluster + "/configurations/service_config_versions?service_name.in(HIVE)&is_current=true",
                         RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );

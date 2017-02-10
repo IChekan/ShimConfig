@@ -39,6 +39,7 @@ public class RestClient {
                                    @Nullable String bodyValue ) {
 
         // create an instance of the com.sun.jersey.api.client.Client class
+        // https://jfarcand.wordpress.com/2011/03/24/writing-powerful-rest-client-using-the-asynchttpclient-library-and-jersey/
         Client client = ApacheHttpClient.create();
         switch ( authMethod ) {
             case BASIC:

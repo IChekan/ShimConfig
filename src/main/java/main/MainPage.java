@@ -40,6 +40,8 @@ public class MainPage {
     @FXML
     TextField testPropertiesPath;
     @FXML
+    TextField restHost;
+    @FXML
     ChoiceBox shimChoice;
 
     @FXML
@@ -64,14 +66,15 @@ public class MainPage {
         }
         else {
             buttonStart.setDisable( true );
-            String[] values = new String[7];
+            String[] values = new String[8];
             values[0] = pathToShim.getText();
             values[1] = cluster_node_FQDN.getText();
             values[2] = sshUser.getText();
             values[3] = sshPassword.getText();
             values[4] = restUser.getText();
             values[5] = restPassword.getText();
-            values[6] = testPropertiesPath.getText();
+            values[6] = restHost.getText();
+            values[7] = testPropertiesPath.getText();
 
             Thread thread = new Thread() {
                 public void run() {

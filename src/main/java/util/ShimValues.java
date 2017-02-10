@@ -13,6 +13,7 @@ public final class ShimValues {
     private static String pathToShim;
     private static String pathToTestProperties; //optional
 
+    private static String restHost;
     private static String restUser;
     private static String restPassword;
 
@@ -34,14 +35,20 @@ public final class ShimValues {
     };
 
     public static void populateValues( String pathToConfigFile ) {
-        sshUser = PropertyHandler.getPropertyFromFile( pathToConfigFile , "user");
-        sshHost = PropertyHandler.getPropertyFromFile( pathToConfigFile, "host" );
+        sshUser = PropertyHandler.getPropertyFromFile( pathToConfigFile , "sshUser");
+        sshHost = PropertyHandler.getPropertyFromFile( pathToConfigFile, "sshHost" );
         sshPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "password" );
         String pathToShimTemp = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToShim" );
         if ( pathToShimTemp.substring(pathToShimTemp.length() - 1).equalsIgnoreCase(File.separator) ) {
             pathToShim = pathToShimTemp;
         } else {
             pathToShim = pathToShimTemp + File.separator;
+        }
+        String restHostTemp = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restHost");
+        if ( restHostTemp == null || restHostTemp.equals("")) {
+            restHost = sshHost;
+        } else {
+            restHost = restHostTemp;
         }
         restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
@@ -63,7 +70,12 @@ public final class ShimValues {
         sshPassword = configs[3];
         restUser = configs[4];
         restPassword = configs[5];
-        pathToTestProperties = configs[6];
+        if ( configs[6] == null || configs[6].equals("")) {
+            restHost = sshHost;
+        } else {
+            restHost = configs[6];
+        }
+        pathToTestProperties = configs[7];
     }
 
     public static void populateValuesAfterDownloading(){
@@ -132,5 +144,9 @@ public final class ShimValues {
 
     public static String getRestPassword() {
         return restPassword;
+    }
+
+    public static String getRestHost() {
+        return restHost;
     }
 }
