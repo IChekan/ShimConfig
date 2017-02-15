@@ -14,8 +14,8 @@
       <PasswordField id="restPassword" fx:id="restPassword" layoutX="315.0" layoutY="211.0" prefHeight="31.0" prefWidth="244.0" promptText="REST password (&quot;default admin&quot;)" />
       <TextField id="testPropertiesPath" fx:id="testPropertiesPath" layoutX="39.0" layoutY="262.0" prefHeight="31.0" prefWidth="417.0" promptText="Path to test.properties file" />
       <TextField id="restHost" fx:id="restHost" disable="true" focusTraversable="false" layoutX="39.0" layoutY="424.0" prefHeight="31.0" prefWidth="417.0" promptText="Optional restHost ( for Azure shim )" />
+      <TextField id="dfsInstallDir" fx:id="dfsInstallDir" layoutX="39.0" layoutY="318.0" prefHeight="31.0" prefWidth="417.0" promptText="Optional: this will be added to /opt/pentaho/mapreduce" />
       <Button id="buttonStart" fx:id="buttonStart" layoutX="198.0" layoutY="371.0" mnemonicParsing="false" onAction="#buttonInit" prefHeight="31.0" prefWidth="205.0" text="Start" />
-      <TextField id="dfsInstallDir" layoutX="39.0" layoutY="318.0" prefHeight="31.0" prefWidth="417.0" promptText="Optional: this will be added to /opt/pentaho/mapreduce" />
       <!---->
       <!--<Button id="buttonSetDefaults" fx:id="buttonSetDefaults" focusTraversable="false" layoutX="371.0" layoutY="416.0" mnemonicParsing="false" onAction="#buttonInit" prefHeight="31.0" prefWidth="170.0" text="Set defaults" />-->
       <!--<ChoiceBox id="shimChoice" fx:id="shimChoice" focusTraversable="false" layoutX="39.0" layoutY="416.0" prefHeight="31.0" prefWidth="244.0" />-->

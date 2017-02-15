@@ -55,8 +55,12 @@ public final class ShimValues {
         }
         restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
-
-        dfsInstallDir = PropertyHandler.getPropertyFromFile( pathToConfigFile, "dfsInstallDir" );
+        String dfsInstallDirTemp = PropertyHandler.getPropertyFromFile( pathToConfigFile, "dfsInstallDir" );
+        if (!dfsInstallDirTemp.matches("^[a-zA-Z0-9]*$") ) {
+            System.out.println("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
+            System.exit( -1 );
+        }
+        dfsInstallDir = dfsInstallDirTemp;
 
         String tempPathToTestProperties = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToTestProperties");
         if ( tempPathToTestProperties == null || tempPathToTestProperties.equals("")) {
@@ -80,8 +84,8 @@ public final class ShimValues {
         } else {
             restHost = configs[6];
         }
-        if (!configs[7].matches("\\w+") ) {
-        System.out.println("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
+        if (!configs[7].matches("^[a-zA-Z0-9]+$") || configs[7].equals("") ) {
+        System.out.println("Only english chars and numbers allowed to be added to /opt/pentaho/mapreduce in plugin.properties file.");
         System.exit( -1 );
         }
         dfsInstallDir = configs[7];
