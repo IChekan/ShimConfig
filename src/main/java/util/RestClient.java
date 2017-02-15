@@ -1,16 +1,22 @@
 package util;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.client.apache.ApacheHttpClient;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,89 +35,147 @@ public class RestClient {
         HTTP_METHOD_OPTIONS
     }
 
-    public enum AuthMethod {
-        BASIC
-    }
 
-    public static byte[] callRest( String requestUrl, HttpMethod httpMethod, AuthMethod authMethod,
-                                   @Nullable String restUser, @Nullable String restPassword,
-                                   @Nullable MediaType mediaType, @Nullable HashMap<String, String> header,
+    public static byte[] callRest( String requestUrl, HttpMethod httpMethod,
+                                   String restUser, String restPassword,
+                                   @Nullable String contentType, @Nullable HashMap<String, String> header,
                                    @Nullable String bodyValue ) {
 
-        // create an instance of the com.sun.jersey.api.client.Client class
-        // https://jfarcand.wordpress.com/2011/03/24/writing-powerful-rest-client-using-the-asynchttpclient-library-and-jersey/
-        Client client = ApacheHttpClient.create();
-        switch ( authMethod ) {
-            case BASIC:
-                HTTPBasicAuthFilter basicAuthFilter = new HTTPBasicAuthFilter( restUser, restPassword );
-                client.addFilter( basicAuthFilter );
-                break;
-        }
-        // create a WebResource object, which encapsulates a web resource for the client
-        WebResource webResource = client.resource( requestUrl );
-        WebResource.Builder builder = webResource.getRequestBuilder();
-
-        // Add headers
-        if ( header != null ) {
-            for ( Map.Entry<String, String> entry : header.entrySet() ) {
-                builder = builder.header( entry.getKey(), entry.getValue() );
-            }
-        }
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials( restUser, restPassword );
+        credentialsProvider.setCredentials(AuthScope.ANY, credentials);
 
         byte[] response = null;
+        HttpResponse httpResponse;
+        HttpClient client;
         try {
+            HttpClientBuilder cb = HttpClientBuilder.create();
+            SSLContextBuilder sslcb = new SSLContextBuilder();
+            sslcb.loadTrustMaterial(KeyStore.getInstance(KeyStore.getDefaultType()),
+                    new TrustSelfSignedStrategy());
+            cb.setSSLContext(sslcb.build());
+            client = cb.setDefaultCredentialsProvider(credentialsProvider).build();
+
             switch ( httpMethod ) {
                 case HTTP_METHOD_GET:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.get( ClientResponse.class ).getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.get().setUri( requestUrl );
+                        // Add headers
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_POST:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.type( mediaType ).post( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.post().setUri( requestUrl );
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        if (bodyValue != null && contentType != null){
+                            StringEntity stringEntity = new StringEntity(bodyValue);
+                            stringEntity.setContentType(contentType);
+                        rb.setEntity( stringEntity );
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_PUT:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.type( mediaType ).put( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.put().setUri( requestUrl );
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        if (bodyValue != null && contentType != null){
+                            StringEntity stringEntity = new StringEntity(bodyValue);
+                            stringEntity.setContentType(contentType);
+                            rb.setEntity( stringEntity );
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_DELETE:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.type( mediaType ).delete( ClientResponse.class, bodyValue ).getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.delete().setUri( requestUrl );
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        if (bodyValue != null && contentType != null){
+                            StringEntity stringEntity = new StringEntity(bodyValue);
+                            stringEntity.setContentType(contentType);
+                            rb.setEntity( stringEntity );
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_HEAD:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.head().getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.head().setUri( requestUrl );
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        if (bodyValue != null && contentType != null){
+                            StringEntity stringEntity = new StringEntity(bodyValue);
+                            stringEntity.setContentType(contentType);
+                            rb.setEntity( stringEntity );
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_OPTIONS:
                     try {
-                        response = IOUtils
-                                .toByteArray( builder.options( ClientResponse.class ).getEntityInputStream() );
+                        RequestBuilder rb = RequestBuilder.options().setUri( requestUrl );
+                        if ( header != null ) {
+                            for ( Map.Entry<String, String> entry : header.entrySet() ) {
+                                rb.setHeader(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        if (bodyValue != null && contentType != null){
+                            StringEntity stringEntity = new StringEntity(bodyValue);
+                            stringEntity.setContentType(contentType);
+                            rb.setEntity( stringEntity );
+                        }
+                        HttpUriRequest request = rb.build();
+                        httpResponse = client.execute( request );
+                        response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        e.printStackTrace();
+                        System.out.println( "IOException in RestClient: " + e );
                     }
                     break;
             }
-        } catch ( UniformInterfaceException u ) {
-            System.out.println( u.getResponse().getStatus() );
+        } catch ( Exception e ) {
+            System.out.println( "Exception in RestClient: " + e );
         }
         return response;
     }

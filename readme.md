@@ -27,8 +27,7 @@ It does NOT configure:
 -	Java and java cryptography extension (JCE) 
 -	SHIMS_DATA property for automation (can be added later)
 -	Licenses have to copied manually to data-integration folder for YARN step
--	pmr.kettle.dfs.install.dir=/opt/pentaho/mapreduce property is not changed. (Have to decide if it is needed, can add some random value).
-
+-   Path to spark_submit_utility is not defined
 
 Changelog:
 - 1.0.1:
@@ -41,5 +40,8 @@ Now button "Start" is disabled after starting.
 RestHost property added for Microsift Azure shim. (config for this shim does NOT work for now).
 SqoopSecureLibjarPath disabled for unsecure cluster.
 kinit disabled for unsecure cluster.
+- 1.0.4:
+dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.
+RestClient was modified to ignore ssl sertificate for basic auth.
 
 

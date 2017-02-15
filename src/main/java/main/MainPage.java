@@ -42,6 +42,8 @@ public class MainPage {
     @FXML
     TextField restHost;
     @FXML
+    TextField dfsInstallDir;
+    @FXML
     ChoiceBox shimChoice;
 
     @FXML
@@ -63,10 +65,12 @@ public class MainPage {
                 sshPassword.getText().equals("") || restUser.getText().equals("") ||
                 restPassword.getText().equals("") ) {
             System.out.println("One or more required field(s) is empty! Only test.properties field is not required!");
+        } else if (dfsInstallDir.getText().matches("\\w+") ) {
+            System.out.println("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
         }
         else {
             buttonStart.setDisable( true );
-            String[] values = new String[8];
+            String[] values = new String[9];
             values[0] = pathToShim.getText();
             values[1] = cluster_node_FQDN.getText();
             values[2] = sshUser.getText();
@@ -74,7 +78,8 @@ public class MainPage {
             values[4] = restUser.getText();
             values[5] = restPassword.getText();
             values[6] = restHost.getText();
-            values[7] = testPropertiesPath.getText();
+            values[7] = dfsInstallDir.getText();
+            values[8] = testPropertiesPath.getText();
 
             Thread thread = new Thread() {
                 public void run() {

@@ -24,6 +24,9 @@ public final class ShimValues {
     // Values, that is determined from xml files
     private static boolean shimSecured;
 
+    // This will be added to /opt/pentaho/mapreduce in plugin.properties file
+    private static String dfsInstallDir;
+
     // Hardcoded list of files, which will be retrieved from cluster
     private static String[] filesToRetrieve = new String[] {
         "/etc/hadoop/conf/core-site.xml",
@@ -53,6 +56,8 @@ public final class ShimValues {
         restUser = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restUser" );
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
 
+        dfsInstallDir = PropertyHandler.getPropertyFromFile( pathToConfigFile, "dfsInstallDir" );
+
         String tempPathToTestProperties = PropertyHandler.getPropertyFromFile( pathToConfigFile, "pathToTestProperties");
         if ( tempPathToTestProperties == null || tempPathToTestProperties.equals("")) {
             pathToTestProperties = null;
@@ -75,7 +80,12 @@ public final class ShimValues {
         } else {
             restHost = configs[6];
         }
-        pathToTestProperties = configs[7];
+        if (!configs[7].matches("\\w+") ) {
+        System.out.println("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
+        System.exit( -1 );
+        }
+        dfsInstallDir = configs[7];
+        pathToTestProperties = configs[8];
     }
 
     public static void populateValuesAfterDownloading(){
@@ -148,5 +158,9 @@ public final class ShimValues {
 
     public static String getRestHost() {
         return restHost;
+    }
+
+    public static String getDfsInstallDir() {
+        return dfsInstallDir;
     }
 }

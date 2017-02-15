@@ -61,13 +61,13 @@ public class ShimConfigMain extends Application {
             ShimValues.populateValues( args[0]);
             main.ShimConfigRun shimConfigRun = new main.ShimConfigRun();
             shimConfigRun.shimConfigRun();
-        } else if (args.length == 7 || args.length == 8) {
+        } else if (args.length == 8 || args.length == 9) {
             ShimValues.populateValues( args );
         }
         else {
             System.err.println("Use UI version or " +
                     "\\n usage: java -jar thisJar [SomeConfigFile]] " + "\\n or" +
-                    "java -jar [pathToShim] [sshHost] [sshUser] [sshPassword] [restUser] [restPassword] [restHost] [optional:pathToTestProperties]");
+                    "java -jar [pathToShim] [sshHost] [sshUser] [sshPassword] [restUser] [restPassword] [restHost] [dfsInstalDir] [optional:pathToTestProperties]");
             System.exit(-1);
         }
     }

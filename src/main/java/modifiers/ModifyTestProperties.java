@@ -100,7 +100,7 @@ public class ModifyTestProperties {
     private static void setHiveHost( String pathToTestProperties ) {
         if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
             String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/hosts",
-                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                    RestClient.HttpMethod.HTTP_METHOD_GET,
                     ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
                 JSONObject obj = new JSONObject( allClusterNodesFromRest );
@@ -115,7 +115,7 @@ public class ModifyTestProperties {
             }
         } else {
             String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/hosts",
-                    RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                    RestClient.HttpMethod.HTTP_METHOD_GET,
                     ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
             try {
                 JSONObject obj = new JSONObject( allClusterNodesFromRest );
@@ -150,7 +150,7 @@ public class ModifyTestProperties {
         if ( ShimValues.isShimSecured() ) {
             if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "cdh" ) ) {
                 String cmCluster = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/clusters",
-                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        RestClient.HttpMethod.HTTP_METHOD_GET,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
                 String cluster = "";
                 try {
@@ -162,14 +162,14 @@ public class ModifyTestProperties {
 
                 byte[] zipFromCM = RestClient.callRest( "http://" + ShimValues.getRestHost()
                                 + ":7180/api/v10/clusters/" + cluster + "/services/hive/clientConfig",
-                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        RestClient.HttpMethod.HTTP_METHOD_GET,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null );
 
                 File tempHiveSiteXML = null;
                 try {
                     tempHiveSiteXML = ShimFileUtils.getFileFromZipAndSaveAsTempFile( zipFromCM, "hive-site.xml" );
                 } catch ( IOException e ) {
-                    e.printStackTrace();
+                    System.out.println ("IOException on hive: " + e);
                 }
 
                 String[] hivePrincipalTemp1 = XmlPropertyHandler.readXmlPropertyValue( tempHiveSiteXML.getAbsolutePath(),
@@ -180,7 +180,7 @@ public class ModifyTestProperties {
                 String fullImpalaConfig =
                         new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":7180/api/v10/clusters/" + cluster
                                         + "/services/impala/config?view=FULL", RestClient.HttpMethod.HTTP_METHOD_GET,
-                                RestClient.AuthMethod.BASIC, ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null,
+                              ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null,
                                 null ) );
 
                 String impalaKrbServiceName = "";
@@ -205,7 +205,7 @@ public class ModifyTestProperties {
                 PropertyHandler.setProperty( pathToTestProperties, "impala_KrbServiceName", impalaKrbServiceName );
             } else {
                 String ambariCluster = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/clusters/",
-                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        RestClient.HttpMethod.HTTP_METHOD_GET,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
                 String cluster = "";
                 try {
@@ -218,7 +218,7 @@ public class ModifyTestProperties {
 
                 String ambariHive = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/clusters/"
                                 + cluster + "/configurations/service_config_versions?service_name.in(HIVE)&is_current=true",
-                        RestClient.HttpMethod.HTTP_METHOD_GET, RestClient.AuthMethod.BASIC,
+                        RestClient.HttpMethod.HTTP_METHOD_GET,
                         ShimValues.getRestUser(), ShimValues.getRestPassword(), null, null, null ) );
 
                 String ambariPrincipal = "";
