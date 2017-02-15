@@ -65,7 +65,7 @@ public class MainPage {
                 sshPassword.getText().equals("") || restUser.getText().equals("") ||
                 restPassword.getText().equals("") ) {
             System.out.println("One or more required field(s) is empty! Only test.properties field is not required!");
-        } else if (!dfsInstallDir.getText().matches("^[a-zA-Z0-9]+$") || dfsInstallDir.getText().equals("") ) {
+        } else if (!dfsInstallDir.getText().matches("^[a-zA-Z0-9]*$") ) {
             System.out.println("Only english chars and numbers allowed to be added to /opt/pentaho/mapreduce in plugin.properties file.");
         }
         else {

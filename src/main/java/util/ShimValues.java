@@ -84,7 +84,7 @@ public final class ShimValues {
         } else {
             restHost = configs[6];
         }
-        if (!configs[7].matches("^[a-zA-Z0-9]+$") || configs[7].equals("") ) {
+        if (!configs[7].matches("^[a-zA-Z0-9]*$") ) {
         System.out.println("Only english chars and numbers allowed to be added to /opt/pentaho/mapreduce in plugin.properties file.");
         System.exit( -1 );
         }
