@@ -43,5 +43,6 @@ kinit disabled for unsecure cluster.
 - 1.0.4:
 dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.
 RestClient was modified to ignore ssl sertificate for basic auth.
-
+- 1.0.5:
+Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed
 

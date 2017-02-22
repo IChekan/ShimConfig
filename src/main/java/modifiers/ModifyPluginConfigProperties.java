@@ -54,7 +54,7 @@ public class ModifyPluginConfigProperties {
 
         // modifying /opt/pentaho/mapreduce in plugin.properties file
         PropertyHandler.setProperty(pluginPropertiesFile, "pmr.kettle.dfs.install.dir",
-                "opt/pentaho/mapreduce_" + ShimValues.getDfsInstallDir() );
+                "/opt/pentaho/mapreduce_" + ShimValues.getDfsInstallDir() );
     }
 
 }
