@@ -1,22 +1,29 @@
 package util;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.KeyStore;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,20 +48,39 @@ public class RestClient {
                                    @Nullable String contentType, @Nullable HashMap<String, String> header,
                                    @Nullable String bodyValue ) {
 
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials( restUser, restPassword );
-        credentialsProvider.setCredentials(AuthScope.ANY, credentials);
-
         byte[] response = null;
-        HttpResponse httpResponse;
-        HttpClient client;
+        CloseableHttpResponse httpResponse;
+        //HttpClient client;
         try {
-            HttpClientBuilder cb = HttpClientBuilder.create();
+            HttpClientBuilder builder = HttpClientBuilder.create();
+
             SSLContextBuilder sslcb = new SSLContextBuilder();
             sslcb.loadTrustMaterial(KeyStore.getInstance(KeyStore.getDefaultType()),
                     new TrustSelfSignedStrategy());
-            cb.setSSLContext(sslcb.build());
-            client = cb.setDefaultCredentialsProvider(credentialsProvider).build();
+            builder.setSSLContext(sslcb.build());
+
+//            Lookup<AuthSchemeProvider> authSchemeRegistry = RegistryBuilder.<AuthSchemeProvider>create().
+//                    register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory(true)).build();
+//             builder.setDefaultAuthSchemeRegistry(authSchemeRegistry);
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials( restUser, restPassword );
+            credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+            credentialsProvider.setCredentials(new AuthScope(null, -1, AuthScope.ANY_REALM, AuthPolicy.SPNEGO), new Credentials() {
+                @Override
+                public Principal getUserPrincipal() {
+                    return null;
+                }
+                @Override
+                public String getPassword() {
+                    return null;
+                }
+            });
+            builder.setDefaultCredentialsProvider(credentialsProvider);
+            CloseableHttpClient client = builder.build();
+
+            ArrayList<String> authPrefs = new ArrayList<String>();
+            authPrefs.add(AuthSchemes.BASIC);
+            authPrefs.add(AuthSchemes.SPNEGO);
 
             switch ( httpMethod ) {
                 case HTTP_METHOD_GET:
@@ -66,7 +92,12 @@ public class RestClient {
                                 rb.setHeader(entry.getKey(), entry.getValue());
                             }
                         }
+                        RequestConfig config = RequestConfig.custom()
+                                .setTargetPreferredAuthSchemes(authPrefs).build();
+                        rb.setConfig(config);
                         HttpUriRequest request = rb.build();
+                        // TODO: Remove the next line as soon as hdp25 cluster would use "normal" handshake model
+                        request.setHeader((new BasicScheme().authenticate(credentials, request, null)));
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {

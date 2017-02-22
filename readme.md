@@ -45,4 +45,5 @@ dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in pl
 RestClient was modified to ignore ssl sertificate for basic auth.
 - 1.0.5:
 Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed
+Temp fix for hdp25sec cluster added
 
