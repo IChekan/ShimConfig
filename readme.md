@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.4-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.5-jar-with-dependencies.jar/download
 
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
@@ -44,6 +44,6 @@ kinit disabled for unsecure cluster.
 dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.
 RestClient was modified to ignore ssl sertificate for basic auth.
 - 1.0.5:
-Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed
-Temp fix for hdp25sec cluster added
+Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed.
+Temp fix for hdp25sec cluster added.
 
