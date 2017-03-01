@@ -39,7 +39,7 @@ class ShimConfigRun {
 
         // Optional: Modify test.properties
         try {
-            if (ShimValues.getPathToTestProperties() != null || !"".equals(ShimValues.getPathToTestProperties()) ) {
+            if (ShimValues.getPathToTestProperties() != null && !"".equals(ShimValues.getPathToTestProperties()) ) {
                 ModifyTestProperties.modifyAllTestProperties(ShimValues.getPathToTestProperties());
             }
         } catch ( ArrayIndexOutOfBoundsException e) {

@@ -96,8 +96,10 @@ public class RestClient {
                                 .setTargetPreferredAuthSchemes(authPrefs).build();
                         rb.setConfig(config);
                         HttpUriRequest request = rb.build();
-                        // TODO: Remove the next line as soon as hdp25 cluster would use "normal" handshake model
-                        request.setHeader((new BasicScheme().authenticate(credentials, request, null)));
+                        // TODO: Remove the next "if" as soon as hdp25 cluster would use "normal" handshake model
+                        if (ShimValues.getHadoopVendor().equalsIgnoreCase("hdp")) {
+                            request.setHeader((new BasicScheme().authenticate(credentials, request, null)));
+                        }
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
