@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.6-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.7-jar-with-dependencies.jar/download
 
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
@@ -49,6 +49,7 @@ Temp fix for hdp25sec cluster added.
 - 1.0.6:
 Now if dfsInstallDir is not set "pmr.kettle.dfs.install.dir" is not changed.
 Minor fixes.
-
-
+- 1.0.7:
+Cdh hadoop version like x.xx is now parsed correctly.
+Added support of changing secure configuration to unsecure configuration.
 

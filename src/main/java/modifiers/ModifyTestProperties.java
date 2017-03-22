@@ -30,9 +30,7 @@ public class ModifyTestProperties {
         setSpark( pathToTestProperties );
         setHdpVersion();
         setTextSplitter( pathToTestProperties );
-        if (ShimValues.isShimSecured()) {
-            setSqoopSecureLibjarPath(pathToTestProperties);
-        }
+        setSqoopSecureLibjarPath(pathToTestProperties);
     }
 
 
@@ -373,10 +371,14 @@ public class ModifyTestProperties {
 
     //set sqoop_secure_libjar_path
     private static void setSqoopSecureLibjarPath ( String pathToTestProperties ) throws IOException {
-        String filename = Files.find( Paths.get( ShimValues.getPathToShim() + File.separator + "lib" ) , 1 , (p, bfa ) -> bfa.isRegularFile()
-                && p.getFileName().toString().matches( "pentaho-hadoop-shims-.+?-security-.+?\\.jar" ) ).findFirst().get().toString();
+        if (ShimValues.isShimSecured() ) {
+            String filename = Files.find(Paths.get(ShimValues.getPathToShim() + File.separator + "lib"), 1, (p, bfa) -> bfa.isRegularFile()
+                    && p.getFileName().toString().matches("pentaho-hadoop-shims-.+?-security-.+?\\.jar")).findFirst().get().toString();
 
-        PropertyHandler.setProperty( pathToTestProperties, "sqoop_secure_libjar_path", filename );
+            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", filename);
+        } else {
+            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "");
+        }
     }
 
 }

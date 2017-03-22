@@ -50,6 +50,18 @@ public class ModifyPluginConfigProperties {
                 PropertyHandler.setProperty(configPropertiesFile,
                         "pentaho.authentication.default.mapping.server.credentials.kerberos.password", "password");
             }
+        } else {
+            //determine if shim is using impersonation and modify it accordingly
+            if (PropertyHandler.getPropertyFromFile(configPropertiesFile,
+                    "pentaho.authentication.default.mapping.impersonation.type") == null) {
+                PropertyHandler.setProperty(configPropertiesFile, "authentication.superuser.provider", "NO_AUTH");
+            }
+            else {
+                PropertyHandler.setProperty(configPropertiesFile,
+                        "pentaho.authentication.default.mapping.impersonation.type", "disabled");
+                PropertyHandler.setProperty(configPropertiesFile,
+                        "pentaho.authentication.default.kerberos.password", "");
+            }
         }
 
         // modifying /opt/pentaho/mapreduce in plugin.properties file
