@@ -359,7 +359,7 @@ public class ModifyTestProperties {
     //modifying allow_text_splitter value
     private static void setTextSplitter( String pathToTestProperties ) {
         if ( ShimValues.getHadoopVendor().equalsIgnoreCase( "hdp" )
-                && ShimValues.getHadoopVendorVersion().equalsIgnoreCase( "25" )) {
+                && Integer.valueOf( ShimValues.getHadoopVendorVersion() ) > 24 ) {
             PropertyHandler.setProperty( pathToTestProperties, "allow_text_splitter", "org.apache.sqoop.splitter.allow_text_splitter" );
             PropertyHandler.setProperty( pathToTestProperties, "allow_text_splitter_value", "true" );
         }
@@ -375,7 +375,7 @@ public class ModifyTestProperties {
             String filename = Files.find(Paths.get(ShimValues.getPathToShim() + File.separator + "lib"), 1, (p, bfa) -> bfa.isRegularFile()
                     && p.getFileName().toString().matches("pentaho-hadoop-shims-.+?-security-.+?\\.jar")).findFirst().get().toString();
 
-            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", filename);
+            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "file:///" + filename);
         } else {
             PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "");
         }
