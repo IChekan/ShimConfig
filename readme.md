@@ -28,32 +28,32 @@ It does NOT configure:
 - Path to spark_submit_utility is not defined
 
 Changelog:
-- 1.0.1:
+- 1.0.1:  
 Added detection of separator at the end of the path to the shim.  
-- 1.0.2:
+- 1.0.2:  
 Impala and MySql Drivers copy fixed.  
 Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.  
 Now button "Start" is disabled after starting.  
-- 1.0.3:
+- 1.0.3:  
 RestHost property added for Microsift Azure shim. (config for this shim does NOT work for now).  
 SqoopSecureLibjarPath disabled for unsecure cluster.  
 kinit disabled for unsecure cluster.  
-- 1.0.4:
+- 1.0.4:  
 dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.  
 RestClient was modified to ignore ssl sertificate for basic auth.  
-- 1.0.5:
+- 1.0.5:  
 Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed.  
 Temp fix for hdp25sec cluster added.  
-- 1.0.6:
+- 1.0.6:  
 Now if dfsInstallDir is not set "pmr.kettle.dfs.install.dir" is not changed.  
 Minor fixes.  
-- 1.0.7:
+- 1.0.7:  
 Cdh hadoop version like x.xx is now parsed correctly.  
 Added support of changing secure configuration to unsecure configuration.  
-- 1.0.8:
+- 1.0.8:  
 "allow_text_splitter" is now correctly set for hdp26 clusters.  
 "sqoop_secure_libjar_path" is now set with "file:///" prefix.  
-- 1.0.9:
+- 1.0.9:  
 Added log into UI.  
 Added copying SparkSQL driver to CDH shim folder.  
 Now drivers for copying can be in sub-folder.  
