@@ -7,11 +7,9 @@ The utility have GUI and console running modes. It works on both Windows and Lin
 
 For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
 
-For console run, there are two methods:
-
-1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)
-
-2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
+For console run, there are two methods:  
+1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)  
+2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”  
 
 It does:
 - Modifies all necessary settings in plugin.properties
@@ -31,36 +29,36 @@ It does NOT configure:
 
 Changelog:
 - 1.0.1:
-Added detection of separator at the end of the path to the shim.
+Added detection of separator at the end of the path to the shim.  
 - 1.0.2:
-Impala and MySql Drivers copy fixed.
-Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.
-Now button "Start" is disabled after starting.
+Impala and MySql Drivers copy fixed.  
+Property "pentaho.authentication.default.mapping.server.credentials.kerberos.principal" is changed to “hive@PENTAHOQA.COM” instead of devuser@PENTAHOQA.COM.  
+Now button "Start" is disabled after starting.  
 - 1.0.3:
-RestHost property added for Microsift Azure shim. (config for this shim does NOT work for now).
-SqoopSecureLibjarPath disabled for unsecure cluster.
-kinit disabled for unsecure cluster.
+RestHost property added for Microsift Azure shim. (config for this shim does NOT work for now).  
+SqoopSecureLibjarPath disabled for unsecure cluster.  
+kinit disabled for unsecure cluster.  
 - 1.0.4:
-dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.
-RestClient was modified to ignore ssl sertificate for basic auth.
+dfsInstallDir property added, can be used to modify /opt/pentaho/mapreduce in plugin.properties file.  
+RestClient was modified to ignore ssl sertificate for basic auth.  
 - 1.0.5:
-Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed.
-Temp fix for hdp25sec cluster added.
+Small issue with missing "/" in "/opt/pentaho/mapreduce" was fixed.  
+Temp fix for hdp25sec cluster added.  
 - 1.0.6:
-Now if dfsInstallDir is not set "pmr.kettle.dfs.install.dir" is not changed.
-Minor fixes.
+Now if dfsInstallDir is not set "pmr.kettle.dfs.install.dir" is not changed.  
+Minor fixes.  
 - 1.0.7:
-Cdh hadoop version like x.xx is now parsed correctly.
-Added support of changing secure configuration to unsecure configuration.
+Cdh hadoop version like x.xx is now parsed correctly.  
+Added support of changing secure configuration to unsecure configuration.  
 - 1.0.8:
-"allow_text_splitter" is now correctly set for hdp26 clusters.
-"sqoop_secure_libjar_path" is now set with "file:///" prefix
+"allow_text_splitter" is now correctly set for hdp26 clusters.  
+"sqoop_secure_libjar_path" is now set with "file:///" prefix.  
 - 1.0.9:
-Added log into UI.
-Added copying SparkSQL driver to CDH shim folder.
-Now drivers for copying can be in sub-folder.
-Now it uses default values for "ssh user/password" and "rest user/password" if no values was entered.
-Now it can be used multiple times in one run.
-sqoop_secure_libjar_path finally correctly set on windows.
-If .installedLicenses.xml is in the same folder with utility - copied into data-integration folder
-
+Added log into UI.  
+Added copying SparkSQL driver to CDH shim folder.  
+Now drivers for copying can be in sub-folder.  
+Now it uses default values for "ssh user/password" and "rest user/password" if no values was entered.  
+Now it can be used multiple times in one run.  
+sqoop_secure_libjar_path finally correctly set on windows.  
+If .installedLicenses.xml is in the same folder with utility - copied into data-integration folder.  
+Another mechanism for root folder detection - No longer need to launch this utility from its folder.  
