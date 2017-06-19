@@ -53,7 +53,7 @@ Added support of changing secure configuration to unsecure configuration.
 - 1.0.8:  
 "allow_text_splitter" is now correctly set for hdp26 clusters.  
 "sqoop_secure_libjar_path" is now set with "file:///" prefix.  
-- 1.0.9:  
+- 1.0.10:
 Added log into UI.  
 Added copying SparkSQL driver to CDH shim folder.  
 Now drivers for copying can be in sub-folder.  
@@ -62,3 +62,6 @@ Now it can be used multiple times in one run.
 sqoop_secure_libjar_path finally correctly set on windows.  
 If .installedLicenses.xml is in the same folder with utility - copied into data-integration folder.  
 Another mechanism for root folder detection - No longer need to launch this utility from its folder.  
+- 1.0.10
+Fixed: SparkSql driver copied to HDP, not CDH shim folder.
+

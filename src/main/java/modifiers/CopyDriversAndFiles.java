@@ -77,7 +77,7 @@ public class CopyDriversAndFiles {
 
     // copy sparkSQL driver to appropriate place
     public static void copySparkSqlDriver() {
-        if (ShimValues.getHadoopVendor().equalsIgnoreCase("cdh")) {
+        if (ShimValues.getHadoopVendor().equalsIgnoreCase("hdp")) {
 
             String[] filesToCopy = {"ql.jar","SparkJDBC41.jar","TCLIServiceClient.jar"};
 
