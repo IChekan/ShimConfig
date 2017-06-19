@@ -18,6 +18,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -32,6 +33,8 @@ import java.util.Map;
  * Created by Ihar_Chekan on 12/22/2016.
  */
 public class RestClient {
+
+    final static Logger logger = Logger.getLogger(RestClient.class);
 
     public enum HttpMethod {
         HTTP_METHOD_GET,
@@ -103,7 +106,7 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_POST:
@@ -123,7 +126,7 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_PUT:
@@ -143,7 +146,7 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_DELETE:
@@ -163,7 +166,7 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_HEAD:
@@ -183,7 +186,7 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
                 case HTTP_METHOD_OPTIONS:
@@ -203,12 +206,12 @@ public class RestClient {
                         httpResponse = client.execute( request );
                         response = IOUtils.toByteArray (httpResponse.getEntity().getContent());
                     } catch ( IOException e ) {
-                        System.out.println( "IOException in RestClient: " + e );
+                        logger.error( "IOException in RestClient: " + e );
                     }
                     break;
             }
         } catch ( Exception e ) {
-            System.out.println( "Exception in RestClient: " + e );
+            logger.error( "Exception in RestClient: " + e );
         }
         return response;
     }

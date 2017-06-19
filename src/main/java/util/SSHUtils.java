@@ -4,6 +4,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -11,6 +12,8 @@ import java.io.*;
  * Created by Ihar_Chekan on 10/13/2016.
  */
 public class SSHUtils {
+
+    final static Logger logger = Logger.getLogger(SSHUtils.class);
 
     public static void copyFileBySSH ( String user, String host, String password, String retrieveFile, String whereToSaveFile ) {
     FileOutputStream fileOutputStream=null;
@@ -105,10 +108,10 @@ public class SSHUtils {
 
             session.disconnect();
 
-            System.out.println( retrieveFile + " was copied from cluster to " + whereToSaveFile );
+            logger.info( retrieveFile + " was copied from cluster to " + whereToSaveFile );
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e);
             try{if(fileOutputStream!=null)fileOutputStream.close();}catch(Exception ee){}
         }
     }
@@ -131,10 +134,10 @@ public class SSHUtils {
             }
             while(c!='\n');
             if(b==1){ // error
-                System.out.print(sb.toString());
+                logger.error(sb.toString());
             }
             if(b==2){ // fatal error
-                System.out.print(sb.toString());
+                logger.error(sb.toString());
             }
         }
         return b;
@@ -185,7 +188,7 @@ public class SSHUtils {
             session.disconnect();
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e);
         }
         return outputStr;
     }

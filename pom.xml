@@ -6,7 +6,7 @@
 
     <groupId>ShimConfig</groupId>
     <artifactId>ShimConfig</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 
     <build>
         <plugins>
@@ -88,6 +88,12 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
 
     </dependencies>

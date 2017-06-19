@@ -1,5 +1,6 @@
 package modifiers;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import util.XmlPropertyHandler;
@@ -21,6 +22,8 @@ import java.io.IOException;
  */
 public class AddCrossPlatform {
 
+    final static Logger logger = Logger.getLogger(AddCrossPlatform.class);
+
     public void addCrossPlatform(String pathToMapredSiteXML) {
 
         try {
@@ -39,7 +42,7 @@ public class AddCrossPlatform {
             StreamResult result = new StreamResult(new File(pathToMapredSiteXML));
             transformer.transform(source, result);
 
-            System.out.println("cross-platform added");
+            logger.info("cross-platform added");
 
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();

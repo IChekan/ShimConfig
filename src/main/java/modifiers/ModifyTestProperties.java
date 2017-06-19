@@ -1,5 +1,6 @@
 package modifiers;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
  * Created by Ihar_Chekan on 10/14/2016.
  */
 public class ModifyTestProperties {
+
+    final static Logger logger = Logger.getLogger(ModifyTestProperties.class);
 
     private static ArrayList<String> allClusterNodes = new ArrayList<String>();
 
@@ -109,7 +112,7 @@ public class ModifyTestProperties {
                     allClusterNodes.add( hostname );
                 }
             } catch ( JSONException e ) {
-                System.out.println( "JSON exception: " + e );
+                logger.error( "JSON exception: " + e );
             }
         } else {
             String allClusterNodesFromRest = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/hosts",
@@ -125,7 +128,7 @@ public class ModifyTestProperties {
                     allClusterNodes.add( hostname );
                 }
             } catch ( JSONException e ) {
-                System.out.println( "JSON exception: " + e );
+                logger.error( "JSON exception: " + e );
             }
         }
         String hiveServerNode = "";
@@ -142,7 +145,7 @@ public class ModifyTestProperties {
                 PropertyHandler.setProperty( pathToTestProperties, "impala_hostname", hiveServerNode );
             }
         } else {
-            System.out.println( "Hive node was not determined!!!" );
+            logger.error( "Hive node was not determined!!!" );
         }
         //if secured - add hive principal
         if ( ShimValues.isShimSecured() ) {
@@ -155,7 +158,7 @@ public class ModifyTestProperties {
                     JSONObject obj = new JSONObject( cmCluster );
                     cluster = obj.getJSONArray( "items" ).getJSONObject( 0 ).getString( "name" );
                 } catch ( JSONException e ) {
-                    System.out.println( "JSON exception: " + e );
+                    logger.error( "JSON exception: " + e );
                 }
 
                 byte[] zipFromCM = RestClient.callRest( "http://" + ShimValues.getRestHost()
@@ -167,7 +170,7 @@ public class ModifyTestProperties {
                 try {
                     tempHiveSiteXML = ShimFileUtils.getFileFromZipAndSaveAsTempFile( zipFromCM, "hive-site.xml" );
                 } catch ( IOException e ) {
-                    System.out.println ("IOException on hive: " + e);
+                    logger.error ("IOException on hive: " + e);
                 }
 
                 String[] hivePrincipalTemp1 = XmlPropertyHandler.readXmlPropertyValue( tempHiveSiteXML.getAbsolutePath(),
@@ -193,7 +196,7 @@ public class ModifyTestProperties {
                         }
                     }
                 } catch ( JSONException e ) {
-                    System.out.println( "JSON exception: " + e );
+                    logger.error( "JSON exception: " + e );
                 }
 
                 PropertyHandler.setProperty( pathToTestProperties, "hive2_option", "principal" );
@@ -211,7 +214,7 @@ public class ModifyTestProperties {
                     cluster =
                             obj.getJSONArray( "items" ).getJSONObject( 0 ).getJSONObject( "Clusters" ).getString( "cluster_name" );
                 } catch ( JSONException e ) {
-                    System.out.println( "JSON exception: " + e );
+                    logger.error( "JSON exception: " + e );
                 }
 
                 String ambariHive = new String( RestClient.callRest( "http://" + ShimValues.getRestHost() + ":8080/api/v1/clusters/"
@@ -231,7 +234,7 @@ public class ModifyTestProperties {
                         }
                     }
                 } catch ( JSONException e ) {
-                    System.out.println( "JSON exception: " + e );
+                    logger.error( "JSON exception: " + e );
                 }
 
                 String[] hivePrincipalTemp1 = ambariPrincipal.split( "/" );
@@ -289,7 +292,7 @@ public class ModifyTestProperties {
         }
 
         if ( zkQuorumRes.equalsIgnoreCase( "" ) || zkPort.equalsIgnoreCase( "" ) ) {
-            System.out.println( "Both \"hadoop.registry.zk.quorum\" or \"hadoop.registry.zk.quorum\" properties "
+            logger.error( "Both \"hadoop.registry.zk.quorum\" or \"hadoop.registry.zk.quorum\" properties "
                     + "was not found in \"yarn-site.xml\" and \"hbase.zookeeper.quorum\" was not helpful as well... " );
         }
 
@@ -373,9 +376,10 @@ public class ModifyTestProperties {
     private static void setSqoopSecureLibjarPath ( String pathToTestProperties ) throws IOException {
         if (ShimValues.isShimSecured() ) {
             String filename = Files.find(Paths.get(ShimValues.getPathToShim() + File.separator + "lib"), 1, (p, bfa) -> bfa.isRegularFile()
-                    && p.getFileName().toString().matches("pentaho-hadoop-shims-.+?-security-.+?\\.jar")).findFirst().get().toString();
+              && p.getFileName().toString().matches("pentaho-hadoop-shims-.+?-security-.+?\\.jar")).findFirst().get()
+              .toAbsolutePath().normalize().toUri().toString();
 
-            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "file:///" + filename);
+            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", filename);
         } else {
             PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "");
         }

@@ -1,5 +1,6 @@
 package util;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,6 +16,8 @@ import java.io.IOException;
  * Created by Ihar_Chekan on 10/19/2016.
  */
 public class XmlPropertyHandler {
+
+    final static Logger logger = Logger.getLogger(XmlPropertyHandler.class);
 
     public static String readXmlPropertyValue( String pathToFile, String property ) {
         // Read *-site.xml file and return property value, return null if property was not found
@@ -34,11 +37,11 @@ public class XmlPropertyHandler {
             }
 
         } catch ( ParserConfigurationException pce ) {
-            pce.printStackTrace();
+            logger.error( pce );
         } catch ( IOException ioe ) {
-            ioe.printStackTrace();
+            logger.error( ioe );
         } catch ( SAXException sae ) {
-            sae.printStackTrace();
+            logger.error( sae );
         }
 
         return null;

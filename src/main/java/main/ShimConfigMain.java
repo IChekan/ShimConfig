@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import util.ShimValues;
 
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.io.IOException;
  * Created by Ihar_Chekan on 10/13/2016.
  */
 public class ShimConfigMain extends Application {
+
+    final static Logger logger = Logger.getLogger(ShimConfigMain.class);
 
     @Override
     public void start(Stage stage) throws Exception{
@@ -61,13 +64,14 @@ public class ShimConfigMain extends Application {
             ShimValues.populateValues( args[0]);
             main.ShimConfigRun shimConfigRun = new main.ShimConfigRun();
             shimConfigRun.shimConfigRun();
+            System.exit(0);
         } else if (args.length == 8 || args.length == 9) {
             ShimValues.populateValues( args );
         }
         else {
-            System.err.println("Use UI version or " +
-                    "\\n usage: java -jar thisJar [SomeConfigFile]] " + "\\n or" +
-                    "java -jar [pathToShim] [sshHost] [sshUser] [sshPassword] [restUser] [restPassword] [restHost] [dfsInstalDir] [optional:pathToTestProperties]");
+            logger.error("Use UI version or: " +
+                    "\n usage: java -jar thisJar [SomeConfigFile]] " + "\n" +
+                    " java -jar [pathToShim] [sshHost] [sshUser] [sshPassword] [restUser] [restPassword] [restHost] [dfsInstalDir] [optional:pathToTestProperties]");
             System.exit(-1);
         }
     }

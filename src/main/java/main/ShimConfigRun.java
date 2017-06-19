@@ -1,9 +1,11 @@
 package main;
 
 import modifiers.AddCrossPlatform;
-import modifiers.DetectAndCopyDrivers;
+import modifiers.CopyFilesFromCluster;
+import modifiers.CopyDriversAndFiles;
 import modifiers.ModifyPluginConfigProperties;
 import modifiers.ModifyTestProperties;
+import org.apache.log4j.Logger;
 import util.SSHUtils;
 import util.ShimValues;
 
@@ -14,12 +16,12 @@ import java.io.IOException;
  */
 class ShimConfigRun {
 
+    final static Logger logger = Logger.getLogger(ShimConfigRun.class);
+
     public void shimConfigRun () {
 
-        for (int i = 0; i < ShimValues.getFilesToRetrieve().length; i++) {
-            SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
-                    ShimValues.getFilesToRetrieve()[i], ShimValues.getPathToShim());
-        }
+        CopyFilesFromCluster copyFilesFromCluster = new CopyFilesFromCluster();
+        copyFilesFromCluster.copySiteXmlFilesFromCluster();
 
         //set Values after copying the *-site.xml files
         ShimValues.populateValuesAfterDownloading();
@@ -33,6 +35,9 @@ class ShimConfigRun {
         AddCrossPlatform addCrossPlatform = new AddCrossPlatform();
         addCrossPlatform.addCrossPlatform(ShimValues.getPathToShim() + "mapred-site.xml");
 
+        // Copying krb5.conf
+        copyFilesFromCluster.copyKrb5conf();
+
         // Modify plugin.properties
         ModifyPluginConfigProperties modifyPluginConfigProperties = new ModifyPluginConfigProperties();
         modifyPluginConfigProperties.modifyPluginProperties();
@@ -43,16 +48,17 @@ class ShimConfigRun {
                 ModifyTestProperties.modifyAllTestProperties(ShimValues.getPathToTestProperties());
             }
         } catch ( ArrayIndexOutOfBoundsException e) {
-            System.out.println( "ArrayIndexOutOfBoundsException: " + e );
+            logger.error( "ArrayIndexOutOfBoundsException: " + e );
         } catch ( IOException e ) {
-            System.out.println( "IOexception: " + e );
+            logger.error( "IOexception: " + e );
         }
 
-        //Copy impala simba and MySQL driver to appropriate place
-        DetectAndCopyDrivers.copyImpalaSimbaDriver();
-        DetectAndCopyDrivers.copyMySqlDriver();
+        //Copy impala simba and MySQL drivers and license file to appropriate place
+        CopyDriversAndFiles.copyLicensesForSpoon();
+        CopyDriversAndFiles.copyImpalaSimbaDriver();
+        CopyDriversAndFiles.copyMySqlDriver();
+        CopyDriversAndFiles.copySparkSqlDriver();
 
-        System.out.println("Finished. Please check the log above to be sure all is ok.");
-        System.exit(0);
+        logger.info("Finished. Please check the log above to be sure all is ok.");
     }
 }

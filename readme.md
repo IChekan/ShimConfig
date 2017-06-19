@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.8-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.9-jar-with-dependencies.jar/download
 
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
@@ -14,7 +14,7 @@ For console run, there are two methods:
 2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”
 
 It does:
--   Modifies all necessary settings in plugin.properties
+- Modifies all necessary settings in plugin.properties
 -	Modifies all necessary settings in config.properties, including Kerberos settings before/after impersonation 
 -	Copies all necessary *.-site.xml files from cluster
 -	Adds “cross-platform” to mapred-site.xml
@@ -26,8 +26,8 @@ It does NOT configure:
 -	File “hosts”
 -	Java and java cryptography extension (JCE) 
 -	SHIMS_DATA property for automation (can be added later)
--	Licenses have to copied manually to data-integration folder for YARN step
--   Path to spark_submit_utility is not defined
+-	Licenses is to data-integration folder for YARN step only if they are in the same folder with utility (can add more places to look for them)
+- Path to spark_submit_utility is not defined
 
 Changelog:
 - 1.0.1:
@@ -55,3 +55,12 @@ Added support of changing secure configuration to unsecure configuration.
 - 1.0.8:
 "allow_text_splitter" is now correctly set for hdp26 clusters.
 "sqoop_secure_libjar_path" is now set with "file:///" prefix
+- 1.0.9:
+Added log into UI.
+Added copying SparkSQL driver to CDH shim folder.
+Now drivers for copying can be in sub-folder.
+Now it uses default values for "ssh user/password" and "rest user/password" if no values was entered.
+Now it can be used multiple times in one run.
+sqoop_secure_libjar_path finally correctly set on windows.
+If .installedLicenses.xml is in the same folder with utility - copied into data-integration folder
+

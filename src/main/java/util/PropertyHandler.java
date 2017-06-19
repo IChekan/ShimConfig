@@ -2,6 +2,7 @@ package util;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -9,6 +10,8 @@ import java.io.*;
  * Created by Ihar_Chekan on 10/19/2016.
  */
 public class PropertyHandler {
+
+    final static Logger logger = Logger.getLogger(PropertyHandler.class);
 
     public static String getPropertyFromFile( String pathToFile, String property ) {
         // Read property file and return property value, return null if property was not found
@@ -26,10 +29,10 @@ public class PropertyHandler {
             return resProperty.toString();
 
         } catch ( IOException ex ) {
-            System.out.println("IOException: " + ex);
+            logger.error("IOException: " + ex);
             //ex.printStackTrace();
         } catch ( ConfigurationException ce ) {
-            System.out.println("ConfigurationException: " + ce);
+            logger.error("ConfigurationException: " + ce);
             //ce.printStackTrace();
         }
 
@@ -52,20 +55,20 @@ public class PropertyHandler {
             output = new FileOutputStream( file );
             prop.save( output, null );
 
-            System.out.println( "property \"" + property + "\" is set to value \"" + value + "\" in file \"" + file + "\"" );
+            logger.info( "property \"" + property + "\" is set to value \"" + value + "\" in file \"" + file + "\"" );
 
         } catch ( IOException ex ) {
-            System.out.println("IOException: " + ex);
+            logger.error("IOException: " + ex);
             //ex.printStackTrace( );
         } catch ( ConfigurationException ce ) {
-            System.out.println("ConfigurationException: " + ce);
+            logger.error("ConfigurationException: " + ce);
             //ce.printStackTrace();
         } finally {
             if ( input != null ) {
                 try {
                     input.close( );
                 } catch ( IOException e ) {
-                    System.out.println("IOException: " + e);
+                    logger.error("IOException: " + e);
                     //e.printStackTrace( );
                 }
             }
@@ -73,7 +76,7 @@ public class PropertyHandler {
                 try {
                     output.close();
                 } catch ( IOException e ) {
-                    System.out.println("IOException: " + e);
+                    logger.error("IOException: " + e);
                     //e.printStackTrace();
                 }
             }

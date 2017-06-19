@@ -1,5 +1,6 @@
 package modifiers;
 
+import org.apache.log4j.Logger;
 import util.PropertyHandler;
 import util.SSHUtils;
 import util.ShimValues;
@@ -11,12 +12,9 @@ import java.io.File;
  */
 public class ModifyPluginConfigProperties {
 
+    final static Logger logger = Logger.getLogger(ModifyPluginConfigProperties.class);
+
     public void modifyPluginProperties () {
-        if (ShimValues.isShimSecured()) {
-            SSHUtils.copyFileBySSH(ShimValues.getSshUser(), ShimValues.getSshHost(), ShimValues.getSshPassword(),
-                    "/etc/krb5.conf", ShimValues.getPathToShim() );
-            System.out.println("krb5.conf copied from cluster to shim location. Please move it to appropriate place.");
-        }
 
         // Determine shim folder
         File f = new File(ShimValues.getPathToShim());

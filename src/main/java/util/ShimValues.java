@@ -1,11 +1,15 @@
 package util;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 
 /**
  * Created by Ihar_Chekan on 10/14/2016.
  */
 public final class ShimValues {
+
+    final static Logger logger = Logger.getLogger(ShimValues.class);
 
     private static String sshUser;
     private static String sshHost;
@@ -57,7 +61,7 @@ public final class ShimValues {
         restPassword = PropertyHandler.getPropertyFromFile( pathToConfigFile, "restPassword" );
         String dfsInstallDirTemp = PropertyHandler.getPropertyFromFile( pathToConfigFile, "dfsInstallDir" );
         if (!dfsInstallDirTemp.matches("^[a-zA-Z0-9]*$") ) {
-            System.out.println("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
+            logger.error("Only english chars and numbers allowed to added to /opt/pentaho/mapreduce in plugin.properties file.");
             System.exit( -1 );
         }
         dfsInstallDir = dfsInstallDirTemp;
@@ -85,7 +89,7 @@ public final class ShimValues {
             restHost = configs[6];
         }
         if (!configs[7].matches("^[a-zA-Z0-9]*$") ) {
-        System.out.println("Only english chars and numbers allowed to be added to /opt/pentaho/mapreduce in plugin.properties file.");
+        logger.error("Only english chars and numbers allowed to be added to /opt/pentaho/mapreduce in plugin.properties file.");
         System.exit( -1 );
         }
         dfsInstallDir = configs[7];
@@ -102,7 +106,7 @@ public final class ShimValues {
         String secured = XmlPropertyHandler.readXmlPropertyValue(pathToShim + "core-site.xml",
             "hadoop.security.authorization" );
         if (secured == null ) {
-        System.out.println("Unable to read 'hadoop.security.authorization' property!!!");
+        logger.error("Unable to read 'hadoop.security.authorization' property!!!");
         }
         else if (secured.equalsIgnoreCase("true")) {
             ShimValues.shimSecured = true;
