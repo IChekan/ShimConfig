@@ -53,7 +53,7 @@ Added support of changing secure configuration to unsecure configuration.
 - 1.0.8:  
 "allow_text_splitter" is now correctly set for hdp26 clusters.  
 "sqoop_secure_libjar_path" is now set with "file:///" prefix.  
-- 1.0.10:
+- 1.0.9:
 Added log into UI.  
 Added copying SparkSQL driver to CDH shim folder.  
 Now drivers for copying can be in sub-folder.  
