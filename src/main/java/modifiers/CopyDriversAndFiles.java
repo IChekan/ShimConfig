@@ -19,6 +19,8 @@ public class CopyDriversAndFiles {
 
     final static Logger logger = Logger.getLogger( CopyDriversAndFiles.class);
 
+    private static String rootUtilityFolder;
+
     //Copy impala simba driver to appropriate place
     public static void copyImpalaSimbaDriver() {
         if (ShimValues.getHadoopVendor().equalsIgnoreCase("cdh")) {
@@ -42,7 +44,7 @@ public class CopyDriversAndFiles {
     //Copy mysql driver to appropriate place
     public static void copyMySqlDriver() {
         try {
-            Path mysqlDriverPath = findFileInThisUtilityParent( "mysql-connector-java-.+?-bin.jar" );
+            Path mysqlDriverPath = findFileInThisUtilityFolder( "mysql-connector-java-.+?-bin.jar" );
             if (Files.exists(mysqlDriverPath)) {
                 Path pathToShim = Paths.get(ShimValues.getPathToShim());
                 if (pathToShim.getParent().getParent().getParent().getParent().getFileName().toString().
@@ -102,7 +104,7 @@ public class CopyDriversAndFiles {
     public static void copyLicensesForSpoon () {
         try {
             if ( Paths.get( ShimValues.getPathToShim() ).getParent().getParent().getParent().getParent().getFileName().toString().equals( "data-integration" ) ) {
-                Path installedLicensesPath = findFileInThisUtilityParent( ".installedLicenses.xml" );
+                Path installedLicensesPath = findFileInThisUtilityFolder( ".installedLicenses.xml" );
                 if ( Files.exists( installedLicensesPath ) ) {
                      Files.copy( installedLicensesPath, Paths.get( ShimValues.getPathToShim() ).getParent().getParent().getParent().getParent() );
                 }
@@ -121,18 +123,32 @@ public class CopyDriversAndFiles {
     }
 
     private static void copyDriverFileToShimLib ( String driverFile ) throws NoSuchElementException, FileAlreadyExistsException, IOException, Exception {
-        Path driverPath = findFileInThisUtilityParent( driverFile );
+        Path driverPath = findFileInThisUtilityFolder( driverFile );
         if ( Files.exists( driverPath ) ) {
             Files.copy( driverPath, Paths.get( ShimValues.getPathToShim() + File.separator + "lib" +
               File.separator + driverPath.getFileName() ) );
         }
     }
 
-    private static Path findFileInThisUtilityParent( String regex ) throws NoSuchElementException, FileAlreadyExistsException, IOException, Exception  {
-        return Files.find(Paths.get(Paths.get( CopyDriversAndFiles.class.getProtectionDomain().getCodeSource().getLocation().toURI() )
-          .getParent().toAbsolutePath().normalize().toString()), 3, (p, bfa) -> bfa.isRegularFile()
+    private static Path findFileInThisUtilityFolder( String regex ) throws NoSuchElementException, FileAlreadyExistsException, IOException, Exception  {
+        return Files.find(Paths.get( getRootUtilityFolder() ), 3, (p, bfa) -> bfa.isRegularFile()
           && p.getFileName().toString().matches( regex ) ).findFirst().get();
     }
 
-
+    public static String getRootUtilityFolder() {
+        if ( rootUtilityFolder == null ) {
+            synchronized ( CopyDriversAndFiles.class ) {
+                if ( rootUtilityFolder == null ) {
+                try {
+                    rootUtilityFolder =
+                      Paths.get( CopyDriversAndFiles.class.getProtectionDomain().getCodeSource().getLocation().toURI() )
+                        .getParent().toAbsolutePath().normalize().toString();
+                } catch ( Exception e ) {
+                    logger.error("this should never happen... " + e );
+                }
+                }
+            }
+        }
+        return rootUtilityFolder;
+    }
 }

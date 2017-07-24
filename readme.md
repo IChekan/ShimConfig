@@ -1,6 +1,6 @@
 This utility configures Pentaho shim. Currently works with CDH and HDP shims.
 
-Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.0.10-jar-with-dependencies.jar/download
+Latest binary can be downloaded here: https://sourceforge.net/projects/shimconfig/files/ShimConfig-1.1.0-jar-with-dependencies.jar/download
 
 
 The utility have GUI and console running modes. It works on both Windows and Linux.
@@ -8,7 +8,7 @@ The utility have GUI and console running modes. It works on both Windows and Lin
 For GUI – execute “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar”
 
 For console run, there are two methods:  
-1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile.properties” (an example for .properties file is included)  
+1. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar somefile” (an example for .properties file is included, also profile files can be used here)
 2. “java -jar ShimConfig-1.0-SNAPSHOT-jar-with-dependencies.jar [pathToShim] [host] [sshUser] [sshPassword] [restUser] [restPassword] [optional:pathToTestProperties] ”  
 
 It does:
@@ -65,3 +65,6 @@ Another mechanism for root folder detection - No longer need to launch this util
 - 1.0.10
 Fixed: SparkSql driver copied to HDP, not CDH shim folder.
 
+- 1.1.0
+Added profiles.
+Added "hive_warehouse" property detection.

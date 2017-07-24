@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import util.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,6 +35,7 @@ public class ModifyTestProperties {
         setHdpVersion();
         setTextSplitter( pathToTestProperties );
         setSqoopSecureLibjarPath(pathToTestProperties);
+        setHiveWarehouseDir( pathToTestProperties );
     }
 
 
@@ -375,14 +377,26 @@ public class ModifyTestProperties {
     //set sqoop_secure_libjar_path
     private static void setSqoopSecureLibjarPath ( String pathToTestProperties ) throws IOException {
         if (ShimValues.isShimSecured() ) {
-            String filename = Files.find(Paths.get(ShimValues.getPathToShim() + File.separator + "lib"), 1, (p, bfa) -> bfa.isRegularFile()
-              && p.getFileName().toString().matches("pentaho-hadoop-shims-.+?-security-.+?\\.jar")).findFirst().get()
-              .toAbsolutePath().normalize().toUri().toString();
+            try {
+                // todo: add try/catch to check if this file exists
+                String filename = Files.find( Paths.get( ShimValues.getPathToShim() + File.separator + "lib" ), 1,
+                  ( p, bfa ) -> bfa.isRegularFile() && p.getFileName().toString()
+                  .matches( "pentaho-hadoop-shims-.+?-security-.+?\\.jar" ) ).findFirst()
+                  .get().toAbsolutePath().normalize().toUri().toString();
 
-            PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", filename);
+                PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", filename);
+            } catch ( FileNotFoundException fnfe ) {
+                logger.error( fnfe );
+            }
         } else {
             PropertyHandler.setProperty(pathToTestProperties, "sqoop_secure_libjar_path", "");
         }
+    }
+
+    private static void setHiveWarehouseDir( String pathToTestProperties ) {
+        String hiveWarehouse = XmlPropertyHandler.readXmlPropertyValue( ShimValues.getPathToShim() + "hive-site.xml",
+          "hive.metastore.warehouse.dir" );
+        PropertyHandler.setProperty( pathToTestProperties, "hive_warehouse", hiveWarehouse );
     }
 
 }
