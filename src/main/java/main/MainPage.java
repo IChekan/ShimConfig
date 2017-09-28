@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -220,7 +221,7 @@ public class MainPage {
     }
 
     public void comboBoxProfileChooser () {
-        ArrayList<String> allProfileNames = Profile.loadAllProfileNamesFromDisk();
+        List<String> allProfileNames = Profile.loadAllProfileNamesFromDisk();
 
         if (allProfileNames != null) {
             profileChooser.getItems().setAll( allProfileNames );
